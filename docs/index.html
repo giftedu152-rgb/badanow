@@ -1,1 +1,1312 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Badanow</title><style>@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');*{box-sizing:border-box}body{margin:0;background:#f4f8fa;color:#102f43;font-family:Pretendard,Arial}.hero{color:#fff;padding:25px max(20px,calc((100% - 1050px)/2)) 85px;background:linear-gradient(#043251aa,#057daaaa),url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=80') center/cover}nav{display:flex;justify-content:space-between}.brand{font-size:25px;font-weight:800}.wrap{max-width:1050px;margin:auto;padding:35px 20px}h1{font-size:clamp(32px,6vw,56px);margin:70px 0 10px}.note,.alert{background:#fff;border-radius:12px;padding:14px;margin:10px 0}.note{border:1px solid #b7ddeb;background:#edf9ff}.alert{border-left:5px solid #e44b40}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button,select{font:inherit;padding:10px 14px;border:0;border-radius:9px}.tabs button{background:#e0ebef}.tabs button.on{background:#087fb8;color:#fff}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}.card{background:#fff;padding:16px;border-radius:15px;border:1px solid #dce8ed}.rank{display:flex;gap:14px;align-items:center}.rank>div{flex:1}.gauge{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:conic-gradient(#087fb8 calc(var(--v)*1%),#dce8ed 0)}.gauge i{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#fff;font-style:normal}.met{font-size:13px;color:#55707d;margin-top:9px}.crowd{float:right;padding:5px 8px;border-radius:20px;background:#dff4ff}.near button{background:#087fb8;color:#fff;border:0;border-radius:9px;padding:12px;font:inherit;font-weight:700}.dist p{display:flex;background:#fff;padding:12px;border-radius:8px}.dist b{margin-right:12px}.dist strong{margin-left:auto}@media(max-width:600px){.grid{grid-template-columns:1fr}}</style></head><body><header class="hero"><nav><span class="brand">◉ BADANOW</span><select id="lang" onchange="render()"><option value="ko">한국어</option><option value="en">English</option><option value="zh">中文</option></select></nav><h1 id="head"></h1><p id="sub"></p></header><main class="wrap"><h2 id="safe"></h2><div class="note" id="mock"></div><div class="alert" id="alerts"></div><h2 id="ask"></h2><div class="tabs" id="tabs"></div><div id="level"></div><h2 id="rank"></h2><section class="grid" id="ranks"></section><h2 id="sea"></h2><section class="grid" id="cards"></section><section class="near"><h2 id="near"></h2><p id="privacy"></p><button id="loc" onclick="geo()"></button><div class="dist" id="dist"></div></section></main><script>const B=[['\uad11\uc548\ub9ac','Gwangalli','\u5e7f\u5b89\u91cc',35.153,129.119,25.8,.45,3.2,29,'busy'],['\ud574\uc6b4\ub300','Haeundae','\u6d77\u4e91\u53f0',35.159,129.160,25.5,.72,5.8,28,'very'],['\uc1a1\uc815','Songjeong','\u677e\u4ead',35.179,129.199,24.9,.88,4.6,27,'normal'],['\uc1a1\ub3c4','Songdo','\u677e\u5c9b',35.076,129.017,25.1,.31,2.4,28,'easy'],['\ub2e4\ub300\ud3ec','Dadaepo','\u591a\u5927\u6d66',35.047,128.965,24.6,.58,3.7,27,'none']];let a='swim',lvl='begin';const T={ko:{head:'\ubd80\uc0b0 \ubc14\ub2e4\ub97c \ub354 \uc548\uc804\ud558\uace0 \uc54c\ucc28\uac8c',sub:'\ud604\uc7ac \ubc14\ub2e4 \uc0c1\ud0dc\uc640 \ub098\uc5d0\uac8c \ub9de\ub294 \ud574\ubcc0\uc744 \ud55c\ub208\uc5d0',safe:'\uc624\ub298\uc758 \uc548\uc804 \uc54c\ub9bc',mock:'\u24d8 \ud604\uc7ac \ud45c\uc2dc\ub418\ub294 \ub370\uc774\ud130\ub294 \uac1c\ubc1c\uc6a9 \ubaa8\uc758 \ub370\uc774\ud130\uc785\ub2c8\ub2e4.',ask:'\uc5b4\ub5a4 \ud65c\ub3d9\uc744 \uacc4\ud68d\ud558\uace0 \uc788\ub098\uc694?',rank:'\ucd94\ucc9c \uc21c\uc704',sea:'\ud604\uc7ac \ud574\uc591\u00b7\ub0a0\uc528',near:'\ub0b4 \uc704\uce58\uc5d0\uc11c \uac00\uae4c\uc6b4 \ud574\ubcc0',loc:'\u2316 \ub0b4 \uc704\uce58 \uae30\uc900 \ubcf4\uae30',privacy:'\uc704\uce58 \uc815\ubcf4\ub294 \uc774 \uae30\uae30\uc5d0\uc11c\ub9cc \uc0ac\uc6a9\ud558\uba70 \uc800\uc7a5\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4.',acts:['\ubb3c\ub180\uc774','\ub0a9\uc2dc','\uc11c\ud551','\uc0b0\ucc45'],begin:'\ucd08\ubcf4\uc790',adv:'\uc219\ub828\uc790',alert:'\u26a0 \ud574\uc6b4\ub300: \uc774\uc548\ub958 \uc8fc\uc758 \u2014 \uc785\uc218 \uc804 \ud604\uc7a5 \uc548\uc804\uc694\uc6d0\uc758 \uc548\ub0b4\ub97c \ud655\uc778\ud558\uc138\uc694.'},en:{head:'Explore Busan\u2019s coast, safely',sub:'Live sea conditions and the right beach at a glance',safe:'Today\u2019s safety alerts',mock:'\u24d8 The information currently shown is development mock data.',ask:'What are you planning today?',rank:'Recommended beaches',sea:'Sea & weather now',near:'Beaches near me',loc:'\u2316 Use my location',privacy:'Your location is used only on this device and is never stored.',acts:['Swimming','Fishing','Surfing','Walking'],begin:'Beginner',adv:'Advanced',alert:'\u26a0 Haeundae: rip-current caution \u2014 check lifeguard guidance before entering the water.'},zh:{head:'\u5b89\u5fc3\u63a2\u7d22\u91dc\u5c71\u6d77\u5cb8',sub:'\u4e00\u89c8\u5f53\u524d\u6d77\u51b5\u4e0e\u9002\u5408\u60a8\u7684\u6d77\u6ee9',safe:'\u4eca\u65e5\u5b89\u5168\u63d0\u793a',mock:'\u24d8 \u5f53\u524d\u663e\u793a\u7684\u4fe1\u606f\u4e3a\u5f00\u53d1\u6a21\u62df\u6570\u636e\u3002',ask:'\u60a8\u4eca\u5929\u8ba1\u5212\u4ec0\u4e48\u6d3b\u52a8\uff1f',rank:'\u63a8\u8350\u6392\u540d',sea:'\u5f53\u524d\u6d77\u51b5\u4e0e\u5929\u6c14',near:'\u79bb\u6211\u6700\u8fd1\u7684\u6d77\u6ee9',loc:'\u2316 \u6309\u6211\u7684\u4f4d\u7f6e\u67e5\u770b',privacy:'\u4f4d\u7f6e\u4fe1\u606f\u4ec5\u5728\u672c\u8bbe\u5907\u4f7f\u7528\uff0c\u4e0d\u4f1a\u4fdd\u5b58\u3002',acts:['\u620f\u6c34','\u9493\u9c7c','\u51b2\u6d6a','\u6563\u6b65'],begin:'\u521d\u5b66\u8005',adv:'\u8fdb\u9636',alert:'\u26a0 \u6d77\u4e91\u53f0\uff1a\u6ce8\u610f\u79bb\u5cb8\u6d41 \u2014 \u5165\u6c34\u524d\u8bf7\u786e\u8ba4\u6551\u751f\u5458\u6307\u5f15\u3002'}};function nm(b,l){return b[l=='ko'?0:l=='en'?1:2]}function sc(b){let s=55;if(a=='swim')s+=(1-b[6])*25+(6-b[7])*2;if(a=='fish')s+=(1-b[6])*30+(7-b[7])*3+(lvl=='begin'?(b[6]<.6?10:-10):0);if(a=='surf')s+=25-Math.abs(b[6]-(lvl=='begin'?.8:1.3))*30;if(a=='walk')s+=(7-b[7])*2;if(b[9]=='very')s-=30;return Math.max(5,Math.min(100,Math.round(s)))}function render(){let l=lang.value,t=T[l];for(let k of ['head','sub','safe','mock','ask','rank','sea','near','loc','privacy'])document.getElementById(k).textContent=t[k];alerts.textContent=t.alert;tabs.innerHTML=t.acts.map((x,i)=>`<button class="${a==['swim','fish','surf','walk'][i]?'on':''}" onclick="a='${['swim','fish','surf','walk'][i]}';render()">${x}</button>`).join('');level.innerHTML=a=='fish'||a=='surf'?`<p><button onclick="lvl='begin';render()">${t.begin}</button> <button onclick="lvl='adv';render()">${t.adv}</button></p>`:'';let r=[...B].sort((x,y)=>sc(y)-sc(x));ranks.innerHTML=r.map((b,i)=>`<article class="card rank"><b>${i+1}</b><div><h3>${nm(b,l)}</h3><small>${t.acts[['swim','fish','surf','walk'].indexOf(a)]}</small><div class="met">Wave ${b[6]}m · Wind ${b[7]}m/s</div></div><span class="gauge" style="--v:${sc(b)}"><i>${sc(b)}</i></span></article>`).join('');cards.innerHTML=B.map(b=>`<article class="card"><span class="crowd">● ${b[9]}</span><h3>${nm(b,l)}</h3><div class="met">Water ${b[5]}° · Wave ${b[6]}m · Wind ${b[7]}m/s · Air ${b[8]}°</div></article>`).join('')}function geo(){navigator.geolocation.getCurrentPosition(p=>{let d=(a,b,c,e)=>6371*2*Math.asin(Math.sqrt(Math.sin((c-a)*Math.PI/360)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin((e-b)*Math.PI/360)**2));dist.innerHTML=B.map(b=>[b,d(p.coords.latitude,p.coords.longitude,b[3],b[4])]).sort((x,y)=>x[1]-y[1]).map((x,i)=>`<p><b>${i+1}</b>${nm(x[0],lang.value)}<strong>${x[1].toFixed(1)} km</strong></p>`).join('')},()=>{loc.textContent='Location unavailable'})}render()</script></body></html>
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>바다나우 BADANOW | 부산 해변 시설 지도</title>
+    <meta
+      name="description"
+      content="광안리, 해운대, 송정 해수욕장의 편의시설과 위험요소를 지도와 스마트 순위로 확인하세요."
+    />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      crossorigin=""
+    />
+    <style>
+      :root {
+        --navy: #062b68;
+        --blue: #087fca;
+        --cyan: #19aee6;
+        --sky: #eaf8ff;
+        --ink: #17324a;
+        --muted: #65798b;
+        --line: #d9e7ef;
+        --white: #fff;
+        --yellow: #f7bf2a;
+        --red: #eb4d43;
+        --green: #26a56a;
+        --shadow: 0 12px 36px #06367115;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: #f4f9fc;
+        color: var(--ink);
+        font-family: Pretendard, system-ui, sans-serif;
+      }
+      button,
+      select {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      .shell {
+        max-width: 1180px;
+        margin: auto;
+        padding: 0 20px;
+      }
+      .hero {
+        color: #fff;
+        background:
+          radial-gradient(circle at 88% 15%, #24c1f055, transparent 28%),
+          linear-gradient(135deg, #042860, #086cae 58%, #09a9d3);
+        padding: 18px 0 54px;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+      }
+      .brand img {
+        width: 52px;
+        height: 52px;
+        object-fit: contain;
+        filter: drop-shadow(0 6px 14px #001f5a55);
+      }
+      .brand b {
+        font-size: 25px;
+        letter-spacing: -0.02em;
+      }
+      .brand small {
+        display: block;
+        opacity: 0.75;
+        font-size: 10px;
+        letter-spacing: 0.18em;
+      }
+      .lang {
+        border: 1px solid #ffffff66;
+        background: #ffffff18;
+        color: #fff;
+        border-radius: 12px;
+        padding: 10px;
+      }
+      .lang option {
+        color: #132f44;
+      }
+      .hero-copy {
+        max-width: 730px;
+        padding: 64px 0 10px;
+      }
+      .hero-copy .kicker {
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        font-weight: 800;
+        color: #9fe8ff;
+      }
+      .hero-copy h1 {
+        font-size: clamp(36px, 6vw, 64px);
+        line-height: 1.06;
+        margin: 14px 0;
+      }
+      .hero-copy p {
+        font-size: 18px;
+        line-height: 1.6;
+        margin: 0;
+        color: #ddf7ff;
+      }
+      .mock-note {
+        margin-top: 24px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 13px;
+        border-radius: 999px;
+        background: #001a4533;
+        border: 1px solid #ffffff44;
+        font-size: 13px;
+      }
+      .beach-tabs {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: -26px;
+        position: relative;
+        z-index: 3;
+      }
+      .beach-tab {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: var(--shadow);
+        color: var(--muted);
+        font-weight: 750;
+      }
+      .beach-tab.on {
+        color: #fff;
+        border-color: var(--blue);
+        background: linear-gradient(135deg, var(--navy), var(--blue));
+        transform: translateY(-3px);
+      }
+      .section {
+        padding: 34px 0;
+      }
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      .section-head h2 {
+        margin: 5px 0 0;
+        font-size: 27px;
+      }
+      .eyebrow {
+        color: var(--blue);
+        font-weight: 850;
+        font-size: 11px;
+        letter-spacing: 0.15em;
+      }
+      .location-btn,
+      .map-btn {
+        border: 0;
+        border-radius: 11px;
+        background: var(--blue);
+        color: #fff;
+        padding: 11px 14px;
+        font-weight: 750;
+      }
+      .map-wrap {
+        position: relative;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+      }
+      #map {
+        height: 520px;
+      }
+      .filters {
+        position: absolute;
+        z-index: 500;
+        top: 14px;
+        left: 14px;
+        width: 245px;
+        background: #fffffff2;
+        backdrop-filter: blur(12px);
+        border: 1px solid #dce8ed;
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: 0 12px 28px #062b6828;
+      }
+      .filters strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+      .filter {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 3px;
+        font-size: 13px;
+      }
+      .filter input {
+        width: 17px;
+        height: 17px;
+      }
+      .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+      .blue {
+        background: #178fe5;
+      }
+      .yellow {
+        background: #f1b928;
+      }
+      .red {
+        background: #e94c44;
+      }
+      .map-hint {
+        padding: 11px 15px;
+        background: #f7fbfd;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .pin {
+        width: 30px;
+        height: 30px;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        border: 3px solid #fff;
+        box-shadow: 0 3px 10px #002a5555;
+      }
+      .pin span {
+        display: block;
+        transform: rotate(45deg);
+        text-align: center;
+        line-height: 24px;
+        font-size: 13px;
+      }
+      .smart-panel {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 22px;
+        box-shadow: var(--shadow);
+      }
+      .rank-tabs {
+        display: flex;
+        gap: 8px;
+        overflow: auto;
+        padding-bottom: 5px;
+      }
+      .rank-tab {
+        white-space: nowrap;
+        border: 1px solid var(--line);
+        background: #f1f6f8;
+        color: #466276;
+        border-radius: 999px;
+        padding: 10px 13px;
+        font-weight: 700;
+      }
+      .rank-tab.on {
+        background: var(--navy);
+        border-color: var(--navy);
+        color: #fff;
+      }
+      .algorithm {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 15px 0;
+      }
+      .algorithm span {
+        background: var(--sky);
+        color: #116b9a;
+        padding: 7px 9px;
+        border-radius: 9px;
+        font-size: 12px;
+      }
+      .rank-list {
+        display: grid;
+        gap: 11px;
+      }
+      .rank-card {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 14px;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px;
+      }
+      .rank-card:first-child {
+        border: 2px solid #25a9e4;
+        background: linear-gradient(135deg, #eaf9ff, #fff);
+        box-shadow: 0 10px 25px #15a3e11c;
+      }
+      .medal {
+        font-size: 25px;
+      }
+      .rank-card h3 {
+        margin: 0 0 7px;
+      }
+      .stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .stat {
+        background: #f2f6f8;
+        padding: 6px 8px;
+        border-radius: 8px;
+      }
+      .crowd-easy {
+        color: #067bb2;
+        background: #daf4ff;
+      }
+      .crowd-normal {
+        color: #946000;
+        background: #fff0ba;
+      }
+      .crowd-busy {
+        color: #b42b27;
+        background: #ffe1df;
+      }
+      .score {
+        font-size: 27px;
+        font-weight: 850;
+        color: var(--blue);
+        text-align: center;
+      }
+      .score small {
+        display: block;
+        font-size: 10px;
+        color: var(--muted);
+      }
+      .score .map-btn {
+        font-size: 11px;
+        padding: 8px;
+        margin-top: 6px;
+      }
+      .disclaimer {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.55;
+        margin-top: 14px;
+      }
+      .leaflet-popup-content {
+        font-family: Pretendard, sans-serif;
+        min-width: 210px;
+      }
+      .popup-title {
+        font-weight: 850;
+        font-size: 15px;
+        margin-bottom: 5px;
+      }
+      .popup-cat {
+        font-size: 11px;
+        color: #fff;
+        padding: 4px 7px;
+        border-radius: 99px;
+        display: inline-block;
+      }
+      .popup-desc {
+        font-size: 12px;
+        line-height: 1.5;
+        margin: 8px 0;
+      }
+      .popup-meta {
+        font-size: 11px;
+        color: #607485;
+      }
+      .foot {
+        background: #062b68;
+        color: #d5edff;
+        padding: 32px 0;
+        font-size: 12px;
+        line-height: 1.7;
+      }
+      .foot b {
+        color: #fff;
+        font-size: 17px;
+      }
+      .leaflet-control-attribution {
+        font-size: 9px !important;
+      }
+      @media (max-width: 720px) {
+        .shell {
+          padding: 0 14px;
+        }
+        .brand img {
+          width: 42px;
+          height: 42px;
+        }
+        .brand b {
+          font-size: 20px;
+        }
+        .hero-copy {
+          padding-top: 45px;
+        }
+        .hero-copy p {
+          font-size: 15px;
+        }
+        .beach-tabs {
+          gap: 7px;
+        }
+        .beach-tab {
+          padding: 13px 7px;
+          font-size: 13px;
+        }
+        .section-head {
+          align-items: start;
+          flex-direction: column;
+        }
+        #map {
+          height: 570px;
+        }
+        .filters {
+          position: relative;
+          top: auto;
+          left: auto;
+          width: auto;
+          border: 0;
+          border-radius: 0;
+          border-bottom: 1px solid var(--line);
+          box-shadow: none;
+        }
+        .map-wrap {
+          display: flex;
+          flex-direction: column;
+        }
+        .filters {
+          order: 0;
+        }
+        #map {
+          order: 1;
+        }
+        .map-hint {
+          order: 2;
+        }
+        .rank-card {
+          grid-template-columns: auto 1fr;
+        }
+        .score {
+          grid-column: 2;
+          text-align: left;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .score small {
+          display: inline;
+        }
+        .score .map-btn {
+          margin: 0;
+        }
+        .topbar {
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="shell">
+        <div class="topbar">
+          <div class="brand">
+            <img src="badanow-logo.png" alt="바다나우 파도 로고" />
+            <div><b>BADANOW</b><small>BUSAN BEACH GUIDE</small></div>
+          </div>
+          <select id="languageSelect" class="lang" aria-label="Language">
+            <option value="ko">한국어</option>
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+          </select>
+        </div>
+        <div class="hero-copy">
+          <div class="kicker">BUSAN FACILITY MAP</div>
+          <h1 id="heroTitle"></h1>
+          <p id="heroSub"></p>
+          <div class="mock-note" id="mockNote"></div>
+        </div>
+      </div>
+    </header>
+    <main class="shell">
+      <div class="beach-tabs" id="beachTabs"></div>
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">BEACH MAP</div>
+            <h2 id="mapTitle"></h2>
+          </div>
+          <button id="locateBtn" class="location-btn"></button>
+        </div>
+        <div class="map-wrap">
+          <aside class="filters">
+            <strong id="filterTitle"></strong
+            ><label class="filter"
+              ><input data-group="basic" type="checkbox" checked /><i
+                class="legend-dot blue"
+              ></i
+              ><span id="filterBasic"></span></label
+            ><label class="filter"
+              ><input data-group="care" type="checkbox" checked /><i
+                class="legend-dot yellow"
+              ></i
+              ><span id="filterCare"></span></label
+            ><label class="filter"
+              ><input data-group="risk" type="checkbox" checked /><i
+                class="legend-dot red"
+              ></i
+              ><span id="filterRisk"></span
+            ></label>
+          </aside>
+          <div id="map"></div>
+          <div class="map-hint" id="mapHint"></div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">SMART RANKING</div>
+            <h2 id="rankTitle"></h2>
+          </div>
+        </div>
+        <div class="smart-panel">
+          <div class="rank-tabs" id="rankTabs"></div>
+          <div class="algorithm" id="algorithm"></div>
+          <div class="rank-list" id="rankList"></div>
+          <p class="disclaimer" id="disclaimer"></p>
+        </div>
+      </section>
+    </main>
+    <footer class="foot">
+      <div class="shell">
+        <b>BADANOW</b>
+        <div id="footerText"></div>
+      </div>
+    </footer>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      crossorigin=""
+    ></script>
+    <script>
+      const beaches = {
+        gwangan: {
+          center: [35.1532, 129.1186],
+          zoom: 16,
+          n: { ko: "광안리", en: "Gwangalli", zh: "广安里" },
+        },
+        haeundae: {
+          center: [35.1587, 129.1604],
+          zoom: 16,
+          n: { ko: "해운대", en: "Haeundae", zh: "海云台" },
+        },
+        songjeong: {
+          center: [35.1786, 129.1993],
+          zoom: 16,
+          n: { ko: "송정", en: "Songjeong", zh: "松亭" },
+        },
+      };
+      const P = [
+        [
+          "gwangan",
+          "parking",
+          "basic",
+          35.15385,
+          129.11915,
+          "광안리해수욕장 공영주차장",
+          "Gwangalli Beach Public Parking",
+          "广安里海水浴场公营停车场",
+          "광안동 198-3, 해변 도보 약 2분",
+          "Gwangandong 198-3, about 2 min on foot",
+          "广安洞198-3，步行约2分钟",
+          4.6,
+          "normal",
+          "10분 300원 · 1일 8,000원",
+          300,
+        ],
+        [
+          "gwangan",
+          "parking",
+          "basic",
+          35.15605,
+          129.1232,
+          "민락해변공원 노상 공영주차장",
+          "Millak Beach Park Public Parking",
+          "民乐海边公园公营停车场",
+          "민락동 181-78, 해변 동측",
+          "East side of the beach",
+          "海滩东侧",
+          4.4,
+          "easy",
+          "10분 300원 · 1일 8,000원",
+          300,
+        ],
+        [
+          "gwangan",
+          "parking",
+          "basic",
+          35.15165,
+          129.11255,
+          "수영구청 주차장",
+          "Suyeong-gu Office Parking",
+          "水营区厅停车场",
+          "남천동로 100, 주말 일부 무료 운영",
+          "Weekend free hours may apply",
+          "周末部分时段免费",
+          4.2,
+          "normal",
+          "평일 10분 300원",
+          300,
+        ],
+        [
+          "gwangan",
+          "store",
+          "basic",
+          35.1533,
+          129.1198,
+          "CU 광안해변점",
+          "CU Gwangalli Beach",
+          "CU 广安海边店",
+          "해변 중앙의 24시간 편의점",
+          "24-hour convenience store",
+          "海滩中央24小时便利店",
+          4.5,
+          "busy",
+          "상품별",
+          1500,
+        ],
+        [
+          "gwangan",
+          "toilet",
+          "basic",
+          35.15305,
+          129.1167,
+          "광안리해수욕장 공중화장실",
+          "Gwangalli Public Restroom",
+          "广安里公共卫生间",
+          "장애인 화장실과 세면 시설",
+          "Accessible restroom and wash basins",
+          "设无障碍卫生间和洗手台",
+          4.3,
+          "normal",
+          "무료",
+          0,
+        ],
+        [
+          "gwangan",
+          "care",
+          "care",
+          35.15355,
+          129.1181,
+          "광안리 종합안내소·의무실",
+          "Gwangalli Information & First Aid",
+          "广安里服务台与医务室",
+          "개장기 안전 안내와 응급 처치",
+          "Seasonal safety info and first aid",
+          "开放期提供安全咨询与急救",
+          4.7,
+          "normal",
+          "무료",
+          0,
+        ],
+        [
+          "gwangan",
+          "rental",
+          "care",
+          35.15345,
+          129.12085,
+          "광안리 피서용품 대여소",
+          "Gwangalli Beach Rental",
+          "广安里海滩租赁处",
+          "파라솔 5,000원, 튜브 5,000원 등 참고",
+          "Parasol ₩5,000, tube ₩5,000 reference",
+          "遮阳伞5,000韩元、泳圈5,000韩元（参考）",
+          4.1,
+          "busy",
+          "파라솔 5,000원",
+          5000,
+        ],
+        [
+          "gwangan",
+          "risk",
+          "risk",
+          35.1532,
+          129.1188,
+          "광안리 인파 집중 구역",
+          "Gwangalli Crowd Hotspot",
+          "广安里人流集中区",
+          "주말 저녁·행사 시 혼잡 가능",
+          "May be crowded on weekend evenings and events",
+          "周末晚间及活动期间可能拥挤",
+          3.5,
+          "busy",
+          "안전 주의",
+          9999,
+        ],
+        [
+          "haeundae",
+          "parking",
+          "basic",
+          35.16005,
+          129.16055,
+          "해운대광장 공영주차장",
+          "Haeundae Square Public Parking",
+          "海云台广场公营停车场",
+          "해운대해수욕장 중심 접근",
+          "Central beach access",
+          "靠近海水浴场中心",
+          4.4,
+          "busy",
+          "10분 500원 내외",
+          500,
+        ],
+        [
+          "haeundae",
+          "parking",
+          "basic",
+          35.15735,
+          129.1537,
+          "동백공영주차장",
+          "Dongbaek Public Parking",
+          "冬柏公营停车场",
+          "해변 서측·동백섬 접근",
+          "West beach and Dongbaek access",
+          "靠近海滩西侧及冬柏岛",
+          4.3,
+          "normal",
+          "공영 요금",
+          400,
+        ],
+        [
+          "haeundae",
+          "store",
+          "basic",
+          35.15955,
+          129.1607,
+          "GS25 해운대해변점",
+          "GS25 Haeundae Beach",
+          "GS25 海云台海边店",
+          "해변 광장 인근 편의점",
+          "Convenience store near the plaza",
+          "海滩广场附近便利店",
+          4.4,
+          "busy",
+          "상품별",
+          1500,
+        ],
+        [
+          "haeundae",
+          "toilet",
+          "basic",
+          35.15825,
+          129.1582,
+          "해운대해수욕장 공중화장실",
+          "Haeundae Public Restroom",
+          "海云台公共卫生间",
+          "해변 중앙 공중화장실",
+          "Public restroom near beach center",
+          "海滩中央公共卫生间",
+          4.2,
+          "normal",
+          "무료",
+          0,
+        ],
+        [
+          "haeundae",
+          "care",
+          "care",
+          35.15875,
+          129.16,
+          "해운대 관광안내소·의무실",
+          "Haeundae Info & First Aid",
+          "海云台咨询处与医务室",
+          "관광 안내와 개장기 응급 지원",
+          "Tourist info and seasonal first aid",
+          "旅游咨询与开放期急救",
+          4.8,
+          "normal",
+          "무료",
+          0,
+        ],
+        [
+          "haeundae",
+          "care",
+          "care",
+          35.15865,
+          129.16235,
+          "해운대 샤워·물품보관소",
+          "Haeundae Shower & Locker",
+          "海云台淋浴与寄存处",
+          "샤워 1회 1,000원, 보관함 크기별 요금 참고",
+          "Shower ₩1,000; lockers by size",
+          "淋浴1,000韩元；寄存按尺寸收费",
+          4.5,
+          "busy",
+          "샤워 1,000원",
+          1000,
+        ],
+        [
+          "haeundae",
+          "rental",
+          "care",
+          35.15855,
+          129.1641,
+          "해운대 피서용품 대여소",
+          "Haeundae Beach Rental",
+          "海云台海滩租赁处",
+          "파라솔·튜브·비치베드 대여, 카드 할인 참고",
+          "Parasol, tube, beach bed; card rates may differ",
+          "遮阳伞、泳圈、沙滩床；刷卡价可能不同",
+          4.3,
+          "busy",
+          "파라솔 카드 8,500원",
+          8500,
+        ],
+        [
+          "haeundae",
+          "risk",
+          "risk",
+          35.1581,
+          129.1651,
+          "해운대 이안류 주의 구역",
+          "Haeundae Rip-current Caution",
+          "海云台离岸流注意区",
+          "입수 전 현장 통제와 안전요원 안내 확인",
+          "Check controls and lifeguard guidance",
+          "入水前确认现场管制及救生员指引",
+          3.0,
+          "busy",
+          "입수 주의",
+          9999,
+        ],
+        [
+          "songjeong",
+          "parking",
+          "basic",
+          35.18015,
+          129.20115,
+          "송정해수욕장 공영주차장",
+          "Songjeong Beach Public Parking",
+          "松亭海水浴场公营停车场",
+          "해변 중앙 접근 공영주차장",
+          "Public parking near beach center",
+          "靠近海滩中央的公营停车场",
+          4.4,
+          "normal",
+          "공영 요금",
+          300,
+        ],
+        [
+          "songjeong",
+          "parking",
+          "basic",
+          35.17675,
+          129.1984,
+          "송정호안도로 노상주차장",
+          "Songjeong Seawall Street Parking",
+          "松亭海岸道路停车区",
+          "해변 남측 노상 구간",
+          "Street parking on south beach",
+          "海滩南侧路边停车",
+          4.0,
+          "busy",
+          "구간별 상이",
+          500,
+        ],
+        [
+          "songjeong",
+          "store",
+          "basic",
+          35.17875,
+          129.1998,
+          "세븐일레븐 송정해변점",
+          "7-Eleven Songjeong Beach",
+          "7-Eleven 松亭海边店",
+          "서핑 구역 인근 편의점",
+          "Near the surfing zone",
+          "靠近冲浪区域",
+          4.5,
+          "normal",
+          "상품별",
+          1500,
+        ],
+        [
+          "songjeong",
+          "toilet",
+          "basic",
+          35.1782,
+          129.1991,
+          "송정해수욕장 공중화장실",
+          "Songjeong Public Restroom",
+          "松亭公共卫生间",
+          "해변 중앙 화장실",
+          "Central beach restroom",
+          "海滩中央卫生间",
+          4.2,
+          "normal",
+          "무료",
+          0,
+        ],
+        [
+          "songjeong",
+          "care",
+          "care",
+          35.17915,
+          129.2002,
+          "송정 관광안내소·의무실",
+          "Songjeong Info & First Aid",
+          "松亭咨询处与医务室",
+          "개장기 관광 안내와 응급 지원",
+          "Seasonal information and first aid",
+          "开放期提供咨询与急救",
+          4.7,
+          "easy",
+          "무료",
+          0,
+        ],
+        [
+          "songjeong",
+          "care",
+          "care",
+          35.17845,
+          129.20055,
+          "송정 샤워·세족장",
+          "Songjeong Shower & Foot Wash",
+          "松亭淋浴与洗脚处",
+          "샤워 1회 1,000원 참고",
+          "Shower ₩1,000 reference",
+          "淋浴1,000韩元（参考）",
+          4.5,
+          "normal",
+          "샤워 1,000원",
+          1000,
+        ],
+        [
+          "songjeong",
+          "rental",
+          "care",
+          35.17755,
+          129.19895,
+          "송정 피서용품 대여소",
+          "Songjeong Beach Rental",
+          "松亭海滩租赁处",
+          "파라솔·튜브·비치베드 등 대여",
+          "Parasol, tube and beach-bed rentals",
+          "提供遮阳伞、泳圈、沙滩床租赁",
+          4.4,
+          "normal",
+          "파라솔 카드 8,500원",
+          8500,
+        ],
+        [
+          "songjeong",
+          "risk",
+          "risk",
+          35.17795,
+          129.20145,
+          "송정 서핑·입수 충돌 주의",
+          "Songjeong Surf-zone Caution",
+          "松亭冲浪与游泳区域注意",
+          "서핑 구역 경계를 확인하고 안전거리 유지",
+          "Check surf-zone boundaries and keep distance",
+          "确认冲浪区边界并保持安全距离",
+          3.5,
+          "normal",
+          "안전 주의",
+          9999,
+        ],
+      ].map((x, i) => ({
+        id: i,
+        beach: x[0],
+        cat: x[1],
+        group: x[2],
+        lat: x[3],
+        lng: x[4],
+        name: { ko: x[5], en: x[6], zh: x[7] },
+        desc: { ko: x[8], en: x[9], zh: x[10] },
+        rating: x[11],
+        crowd: x[12],
+        price: { ko: x[13], en: x[13], zh: x[13] },
+        cost: x[14],
+      }));
+      const tr = {
+        ko: {
+          hero: "해변의 모든 편의를\n한눈에, 더 가볍게",
+          sub: "광안리·해운대·송정의 편의시설과 위험요소를 지도와 스마트 순위로 비교하세요.",
+          mock: "ⓘ 장소 좌표는 공개 지도 기반이며 평점·혼잡도·스마트 점수는 기능 시연용 기준값입니다.",
+          map: "해변 시설 지도",
+          loc: "⌖ 내 위치 사용",
+          filter: "지도 핀 필터",
+          basic: "기본 편의시설",
+          care: "케어·대여시설",
+          risk: "위험 요소",
+          hint: "핀을 누르면 상세 정보와 현재 위치 기준 거리를 확인할 수 있습니다.",
+          rank: "최적 장소 스마트 순위",
+          parking: "🅿️ 주차장 순위",
+          store: "🏪 편의점 순위",
+          careTab: "🚿 샤워·세족장 순위",
+          rental: "🏄 대여점 순위",
+          algo: ["📏 거리 35%", "👥 혼잡도 20%", "⭐ 평점 25%", "💰 가격 20%"],
+          distance: "거리",
+          rating: "평점",
+          crowd: "혼잡도",
+          price: "가격",
+          view: "지도에서 보기",
+          easy: "여유",
+          normal: "보통",
+          busy: "혼잡",
+          unknown: "정보 없음",
+          meters: "약 {n}m",
+          noLoc: "해변 중심 기준",
+          locating: "위치 확인 중…",
+          denied: "위치를 사용할 수 없습니다. 브라우저 권한을 확인해 주세요.",
+          disc: "스마트 순위는 거리·혼잡도·평점·가격을 조합한 가상 점수입니다. 영업 여부와 요금은 방문 전 현장에서 다시 확인하세요.",
+          footer:
+            "부산 해변 여행자를 위한 시설 탐색 서비스 · 지도 © OpenStreetMap contributors",
+        },
+        en: {
+          hero: "Every beach convenience,\nat one clear glance",
+          sub: "Compare amenities and safety points at Gwangalli, Haeundae and Songjeong on one smart map.",
+          mock: "ⓘ Coordinates are based on public maps; ratings, crowd levels and smart scores are demo values.",
+          map: "Beach facility map",
+          loc: "⌖ Use my location",
+          filter: "Map pin filters",
+          basic: "Basic amenities",
+          care: "Care & rentals",
+          risk: "Safety risks",
+          hint: "Select a pin to see details and distance from your current location.",
+          rank: "Smart best-place ranking",
+          parking: "🅿️ Parking",
+          store: "🏪 Convenience stores",
+          careTab: "🚿 Shower & foot wash",
+          rental: "🏄 Rentals",
+          algo: [
+            "📏 Distance 35%",
+            "👥 Crowd 20%",
+            "⭐ Rating 25%",
+            "💰 Price 20%",
+          ],
+          distance: "Distance",
+          rating: "Rating",
+          crowd: "Crowd",
+          price: "Price",
+          view: "View on map",
+          easy: "Quiet",
+          normal: "Moderate",
+          busy: "Busy",
+          unknown: "No data",
+          meters: "About {n}m",
+          noLoc: "From beach center",
+          locating: "Finding location…",
+          denied: "Location unavailable. Check your browser permission.",
+          disc: "Smart ranking is a demo score combining distance, crowd, rating and price. Recheck opening hours and fees before visiting.",
+          footer:
+            "Facility finder for Busan beach travelers · Map © OpenStreetMap contributors",
+        },
+        zh: {
+          hero: "海滩便利设施，\n一目了然",
+          sub: "在智能地图上比较广安里、海云台与松亭的便利设施和安全信息。",
+          mock: "ⓘ 地点坐标基于公开地图；评分、拥挤度和智能分数为功能演示数据。",
+          map: "海滩设施地图",
+          loc: "⌖ 使用我的位置",
+          filter: "地图标记筛选",
+          basic: "基本便利设施",
+          care: "护理与租赁设施",
+          risk: "危险因素",
+          hint: "点击标记可查看详细信息及距当前位置的距离。",
+          rank: "最佳地点智能排名",
+          parking: "🅿️ 停车场排名",
+          store: "🏪 便利店排名",
+          careTab: "🚿 淋浴·洗脚处排名",
+          rental: "🏄 租赁店排名",
+          algo: ["📏 距离 35%", "👥 拥挤度 20%", "⭐ 评分 25%", "💰 价格 20%"],
+          distance: "距离",
+          rating: "评分",
+          crowd: "拥挤度",
+          price: "价格",
+          view: "在地图查看",
+          easy: "空闲",
+          normal: "一般",
+          busy: "拥挤",
+          unknown: "暂无信息",
+          meters: "约 {n}米",
+          noLoc: "以海滩中心为准",
+          locating: "正在获取位置…",
+          denied: "无法使用位置，请检查浏览器权限。",
+          disc: "智能排名是综合距离、拥挤度、评分和价格的演示分数。营业时间与费用请在访问前再次确认。",
+          footer:
+            "为釜山海滩游客提供的设施查找服务 · 地图 © OpenStreetMap contributors",
+        },
+      };
+      let lang = "ko",
+        beach = "gwangan",
+        rankCat = "parking",
+        userPos = null,
+        markers = [];
+      const map = L.map("map", { zoomControl: false }).setView(
+        beaches[beach].center,
+        16,
+      );
+      L.control.zoom({ position: "bottomright" }).addTo(map);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap",
+      }).addTo(map);
+      function text(k) {
+        return tr[lang][k];
+      }
+      function crowdLabel(c) {
+        return text(c === "easy" ? "easy" : c === "normal" ? "normal" : "busy");
+      }
+      function name(p) {
+        return p.name[lang];
+      }
+      function categoryName(c) {
+        const labels = {
+          ko: { parking: "주차장", store: "편의점", toilet: "화장실", care: "샤워·세족·의무", rental: "대여시설", risk: "위험요소" },
+          en: { parking: "Parking", store: "Convenience store", toilet: "Restroom", care: "Shower · care", rental: "Rental", risk: "Safety risk" },
+          zh: { parking: "停车场", store: "便利店", toilet: "卫生间", care: "淋浴·护理", rental: "租赁设施", risk: "危险因素" },
+        };
+        return labels[lang][c];
+      }
+      function priceLabel(p) {
+        if (p.cost === 9999) return lang === "ko" ? "안전 주의" : lang === "en" ? "Safety caution" : "安全注意";
+        if (p.cost === 0) return lang === "ko" ? "무료" : lang === "en" ? "Free" : "免费";
+        if (p.cat === "store") return lang === "ko" ? "상품별" : lang === "en" ? "Varies by item" : "按商品";
+        if (p.cat === "parking") return lang === "ko" ? `10분 ${p.cost.toLocaleString()}원` : lang === "en" ? `₩${p.cost.toLocaleString()} / 10 min` : `每10分钟 ₩${p.cost.toLocaleString()}`;
+        return `₩${p.cost.toLocaleString()}`;
+      }
+      function hav(a, b, c, d) {
+        let r = Math.PI / 180,
+          x = (c - a) * r,
+          y = (d - b) * r,
+          z =
+            Math.sin(x / 2) ** 2 +
+            Math.cos(a * r) * Math.cos(c * r) * Math.sin(y / 2) ** 2;
+        return 6371000 * 2 * Math.atan2(Math.sqrt(z), Math.sqrt(1 - z));
+      }
+      function distance(p) {
+        let base = userPos || beaches[beach].center;
+        return Math.round(hav(base[0], base[1], p.lat, p.lng));
+      }
+      function pinColor(g) {
+        return g === "basic" ? "#178fe5" : g === "care" ? "#f1b928" : "#e94c44";
+      }
+      function icon(p) {
+        return L.divIcon({
+          className: "",
+          html: `<div class="pin" style="background:${pinColor(p.group)}"><span>${p.cat === "parking" ? "P" : p.cat === "store" ? "🏪" : p.cat === "toilet" ? "🚻" : p.cat === "care" ? "✚" : p.cat === "rental" ? "🏄" : "!"}</span></div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+        });
+      }
+      function popup(p) {
+        return `<div class="popup-title">${name(p)}</div><span class="popup-cat" style="background:${pinColor(p.group)}">${categoryName(p.cat)}</span><div class="popup-desc">${p.desc[lang]}</div><div class="popup-meta">📏 ${text("meters").replace("{n}", distance(p))} · ⭐ ${p.rating}<br>👥 ${crowdLabel(p.crowd)} · 💰 ${priceLabel(p)}</div>`;
+      }
+      function drawMarkers() {
+        markers.forEach((x) => map.removeLayer(x.m));
+        markers = [];
+        let enabled = [
+          ...document.querySelectorAll(".filter input:checked"),
+        ].map((x) => x.dataset.group);
+        P.filter((p) => p.beach === beach && enabled.includes(p.group)).forEach(
+          (p) => {
+            let m = L.marker([p.lat, p.lng], { icon: icon(p) })
+              .addTo(map)
+              .bindPopup(() => popup(p));
+            markers.push({ p, m });
+          },
+        );
+      }
+      function score(p) {
+        let d = Math.min(distance(p), 1500),
+          ds = 35 * (1 - d / 1500),
+          cs = { easy: 20, normal: 13, busy: 5 }[p.crowd],
+          rs = 25 * (p.rating / 5),
+          ps = p.cost === 0 ? 20 : Math.max(2, 20 - p.cost / 600);
+        return Math.round(ds + cs + rs + ps);
+      }
+      function rankPlaces() {
+        let wanted = rankCat === "care" ? ["care", "toilet"] : [rankCat];
+        let arr = P.filter(
+          (p) => p.beach === beach && wanted.includes(p.cat),
+        ).sort((a, b) => score(b) - score(a));
+        rankList.innerHTML =
+          arr
+            .map(
+              (p, i) =>
+                `<article class="rank-card"><div class="medal">${["🥇", "🥈", "🥉"][i] || `${i + 1}.`}</div><div><h3>${name(p)}</h3><div class="stats"><span class="stat">📏 ${text("meters").replace("{n}", distance(p))}</span><span class="stat">⭐ ${p.rating} / 5.0</span><span class="stat crowd-${p.crowd}">👥 ${crowdLabel(p.crowd)}</span><span class="stat">💰 ${priceLabel(p)}</span></div></div><div class="score">${score(p)}<small>/100</small><button class="map-btn" onclick="showPin(${p.id})">${text("view")}</button></div></article>`,
+            )
+            .join("") || `<p class="disclaimer">${text("unknown")}</p>`;
+      }
+      function showPin(id) {
+        let p = P.find((x) => x.id === id);
+        map.setView([p.lat, p.lng], 18);
+        let found = markers.find((x) => x.p.id === id);
+        if (!found) {
+          let m = L.marker([p.lat, p.lng], { icon: icon(p) })
+            .addTo(map)
+            .bindPopup(() => popup(p));
+          markers.push({ p, m });
+          found = { p, m };
+        }
+        found.m.openPopup();
+        document
+          .querySelector(".map-wrap")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+      function render() {
+        let t = tr[lang];
+        heroTitle.innerHTML = t.hero.replace("\n", "<br>");
+        heroSub.textContent = t.sub;
+        mockNote.textContent = t.mock;
+        mapTitle.textContent = t.map;
+        locateBtn.textContent = t.loc;
+        filterTitle.textContent = t.filter;
+        filterBasic.textContent = t.basic;
+        filterCare.textContent = t.care;
+        filterRisk.textContent = t.risk;
+        mapHint.textContent = t.hint;
+        rankTitle.textContent = t.rank;
+        footerText.textContent = t.footer;
+        beachTabs.innerHTML = Object.entries(beaches)
+          .map(
+            ([k, b]) =>
+              `<button class="beach-tab ${k === beach ? "on" : ""}" onclick="switchBeach('${k}')">${b.n[lang]}</button>`,
+          )
+          .join("");
+        let rc = [
+          ["parking", t.parking],
+          ["store", t.store],
+          ["care", t.careTab],
+          ["rental", t.rental],
+        ];
+        rankTabs.innerHTML = rc
+          .map(
+            ([k, v]) =>
+              `<button class="rank-tab ${k === rankCat ? "on" : ""}" onclick="rankCat='${k}';render()">${v}</button>`,
+          )
+          .join("");
+        algorithm.innerHTML = t.algo.map((x) => `<span>${x}</span>`).join("");
+        disclaimer.textContent = t.disc;
+        drawMarkers();
+        rankPlaces();
+      }
+      function switchBeach(k) {
+        beach = k;
+        map.flyTo(beaches[k].center, beaches[k].zoom);
+        render();
+      }
+      document
+        .querySelectorAll(".filter input")
+        .forEach((x) => x.addEventListener("change", drawMarkers));
+      languageSelect.onchange = (e) => {
+        lang = e.target.value;
+        document.documentElement.lang = lang;
+        render();
+      };
+      locateBtn.onclick = () => {
+        locateBtn.textContent = text("locating");
+        navigator.geolocation.getCurrentPosition(
+          (p) => {
+            userPos = [p.coords.latitude, p.coords.longitude];
+            L.circleMarker(userPos, {
+              radius: 8,
+              color: "#fff",
+              weight: 3,
+              fillColor: "#112f79",
+              fillOpacity: 1,
+            })
+              .addTo(map)
+              .bindPopup("You are here");
+            locateBtn.textContent = text("loc");
+            rankPlaces();
+            drawMarkers();
+          },
+          () => {
+            locateBtn.textContent = text("denied");
+          },
+          { timeout: 10000 },
+        );
+      };
+      render();
+    </script>
+  </body>
+</html>
