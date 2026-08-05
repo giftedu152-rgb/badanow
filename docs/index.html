@@ -213,6 +213,19 @@
         display: block;
         margin-bottom: 8px;
       }
+      .filter-group + .filter-group {
+        border-top: 1px solid rgba(15, 61, 89, 0.1);
+        margin-top: 8px;
+        padding-top: 8px;
+      }
+      .filter.master { font-weight: 800; }
+      .subfilters {
+        border-left: 2px solid rgba(23, 143, 229, 0.16);
+        margin: 3px 0 3px 9px;
+        padding-left: 12px;
+      }
+      .subfilters .filter { font-size: 12px; padding: 4px 0; }
+      .filter input:indeterminate { accent-color: #7c8b96; }
       .filter {
         display: flex;
         align-items: center;
@@ -237,6 +250,25 @@
       }
       .red {
         background: #e94c44;
+      }
+      .mock-badge {
+        background: #fff3cd;
+        border: 1px solid #f0c44d;
+        border-radius: 7px;
+        color: #6b4d00;
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 800;
+        margin-bottom: 7px;
+        padding: 4px 7px;
+      }
+      .popup-address {
+        border-top: 1px solid #e6edf2;
+        color: #365565;
+        font-size: 12px;
+        line-height: 1.45;
+        margin-top: 8px;
+        padding-top: 7px;
       }
       .map-hint {
         padding: 11px 15px;
@@ -517,24 +549,32 @@
           <button id="locateBtn" class="location-btn"></button>
         </div>
         <div class="map-wrap">
-          <aside class="filters">
-            <strong id="filterTitle"></strong
-            ><label class="filter"
-              ><input data-group="basic" type="checkbox" checked /><i
-                class="legend-dot blue"
-              ></i
-              ><span id="filterBasic"></span></label
-            ><label class="filter"
-              ><input data-group="care" type="checkbox" checked /><i
-                class="legend-dot yellow"
-              ></i
-              ><span id="filterCare"></span></label
-            ><label class="filter"
-              ><input data-group="risk" type="checkbox" checked /><i
-                class="legend-dot red"
-              ></i
-              ><span id="filterRisk"></span
-            ></label>
+          <aside class="filters" id="filterPanel">
+            <strong id="filterTitle"></strong>
+            <div class="filter-group" data-master="basic">
+              <label class="filter master"><input type="checkbox" checked /><i class="legend-dot blue"></i><span data-i18n="basic"></span></label>
+              <div class="subfilters">
+                <label class="filter"><input data-sub="store" type="checkbox" checked /><span>🏪</span><span data-i18n="storeFilter"></span></label>
+                <label class="filter"><input data-sub="trash" type="checkbox" checked /><span>🗑️</span><span data-i18n="trashFilter"></span></label>
+                <label class="filter"><input data-sub="parking" type="checkbox" checked /><span>🅿️</span><span data-i18n="parkingFilter"></span></label>
+                <label class="filter"><input data-sub="toilet" type="checkbox" checked /><span>🚻</span><span data-i18n="toiletFilter"></span></label>
+              </div>
+            </div>
+            <div class="filter-group" data-master="care">
+              <label class="filter master"><input type="checkbox" checked /><i class="legend-dot yellow"></i><span data-i18n="care"></span></label>
+              <div class="subfilters">
+                <label class="filter"><input data-sub="shower" type="checkbox" checked /><span>🚿</span><span data-i18n="showerFilter"></span></label>
+                <label class="filter"><input data-sub="rental" type="checkbox" checked /><span>🏄</span><span data-i18n="rentalFilter"></span></label>
+                <label class="filter"><input data-sub="clinic" type="checkbox" checked /><span>🏥</span><span data-i18n="clinicFilter"></span></label>
+              </div>
+            </div>
+            <div class="filter-group" data-master="risk">
+              <label class="filter master"><input type="checkbox" checked /><i class="legend-dot red"></i><span data-i18n="risk"></span></label>
+              <div class="subfilters">
+                <label class="filter"><input data-sub="marineRisk" type="checkbox" checked /><span>🪼</span><span data-i18n="marineRiskFilter"></span></label>
+                <label class="filter"><input data-sub="healthRisk" type="checkbox" checked /><span>👥</span><span data-i18n="healthRiskFilter"></span></label>
+              </div>
+            </div>
           </aside>
           <div id="map"></div>
           <div class="map-hint" id="mapHint"></div>
@@ -1005,7 +1045,47 @@
         crowd: x[12],
         price: { ko: x[13], en: x[13], zh: x[13] },
         cost: x[14],
+        verified: false,
+        source: "Demo",
       }));
+      const verifiedPlaces = [
+        // Public OpenStreetMap objects checked around each beach on 2026-08-05.
+        ["gwangan","store",35.1529536,129.1177742,"CU 광안해변점","CU Gwangalli Beach","CU 广安里海边店","부산 수영구 광안해변로 인근"],
+        ["gwangan","store",35.1527733,129.1176276,"세븐일레븐 광안리점","7-Eleven Gwangalli","7-Eleven 广安里店","부산 수영구 광안해변로 인근"],
+        ["gwangan","store",35.1566766,129.1163707,"GS25 광안점","GS25 Gwangalli","GS25 广安里店","부산 수영구 광안로35번길 인근"],
+        ["gwangan","store",35.1566496,129.1213472,"시시토리","Sisi Tori","Sisi Tori 便利店","부산 수영구 민락동 광안해변로 인근"],
+        ["gwangan","store",35.1599995,129.1203971,"GS25 민락점","GS25 Millak","GS25 民乐店","부산 수영구 민락동 인근"],
+        ["gwangan","parking",35.1515898,129.1159109,"광안리해수욕장 공영주차장","Gwangalli Beach Public Parking","广安里海水浴场公共停车场","부산 수영구 광안해변로 인근"],
+        ["gwangan","parking",35.1547461,129.1276729,"민락공영주차장","Millak Public Parking","民乐公共停车场","부산 수영구 민락동 인근"],
+        ["gwangan","parking",35.1593091,129.1208684,"오거리주차장","Five-way Intersection Parking","五岔路口停车场","부산 수영구 민락동 인근"],
+        ["gwangan","toilet",35.1538419,129.1186734,"광안리 공중화장실","Gwangalli Public Restroom","广安里公共卫生间","부산 수영구 광안해변로 해변 산책로"],
+        ["gwangan","toilet",35.1515099,129.1161352,"남천 해변 공중화장실","Namcheon Beach Restroom","南川海边公共卫生间","부산 수영구 남천동 해변 산책로"],
+        ["gwangan","trash",35.1534275,129.1270263,"민락 해변 산책로 쓰레기통","Millak Promenade Waste Bin","民乐海边步道垃圾桶","부산 수영구 민락동 해변 산책로"],
+        ["haeundae","store",35.1602472,129.1606973,"CU 해운대광장점","CU Haeundae Square","CU 海云台广场店","부산 해운대구 구남로 인근"],
+        ["haeundae","store",35.1601638,129.1620761,"세븐일레븐 해운대점","7-Eleven Haeundae","7-Eleven 海云台店","부산 해운대구 해운대해변로 인근"],
+        ["haeundae","store",35.1605305,129.1622570,"GS25 해운대점","GS25 Haeundae","GS25 海云台店","부산 해운대구 중동 인근"],
+        ["haeundae","store",35.1598170,129.1579200,"이마트24 해운대점","emart24 Haeundae","emart24 海云台店","부산 해운대구 우동 해운대해변로 인근"],
+        ["haeundae","store",35.1598381,129.1547137,"세븐일레븐 동백점","7-Eleven Dongbaek","7-Eleven 冬柏店","부산 해운대구 우동 동백로 인근"],
+        ["haeundae","toilet",35.1589254,129.1597873,"해운대 중앙 공중화장실","Haeundae Central Restroom","海云台中央公共卫生间","부산 해운대구 해운대해변로 해변 산책로"],
+        ["haeundae","toilet",35.1576925,129.1558940,"해운대 서편 공중화장실","Haeundae West Restroom","海云台西侧公共卫生间","부산 해운대구 우동 해변 산책로"],
+        ["songjeong","store",35.1802900,129.2021090,"비치편의점","Beach Convenience Store","海滩便利店","부산 해운대구 송정해변로 인근"],
+        ["songjeong","toilet",35.1762134,129.1971260,"송정 남측 공중화장실","Songjeong South Restroom","松亭南侧公共卫生间","부산 해운대구 송정해변로 남측 산책로"],
+      ].map((x, i) => ({
+        id: 100 + i, beach: x[0], cat: x[1], group: ["store","trash","parking","toilet"].includes(x[1]) ? "basic" : "care",
+        lat: x[2], lng: x[3], name: {ko:x[4],en:x[5],zh:x[6]},
+        desc: {ko:"공개 지도 객체에서 확인된 위치입니다.",en:"Location verified from a public map object.",zh:"此位置已通过公开地图对象核实。"},
+        address: {ko:x[7],en:x[7],zh:x[7]}, verified: true, source: "OpenStreetMap",
+        rating: 4.2, crowd: "normal", cost: x[1] === "parking" ? 300 : 0,
+      }));
+      const mockTrash = [
+        ["gwangan",35.15310,129.11655,"광안리 산책로 쓰레기통 A","Gwangalli Promenade Bin A","广安里步道垃圾桶 A","부산 수영구 광안해변로 산책로"],
+        ["gwangan",35.15425,129.12140,"광안리 산책로 쓰레기통 B","Gwangalli Promenade Bin B","广安里步道垃圾桶 B","부산 수영구 광안해변로 산책로"],
+        ["haeundae",35.15870,129.15710,"해운대 산책로 쓰레기통 A","Haeundae Promenade Bin A","海云台步道垃圾桶 A","부산 해운대구 해운대해변로 산책로"],
+        ["haeundae",35.15905,129.16400,"해운대 산책로 쓰레기통 B","Haeundae Promenade Bin B","海云台步道垃圾桶 B","부산 해운대구 해운대해변로 산책로"],
+        ["songjeong",35.17705,129.19830,"송정 산책로 쓰레기통 A","Songjeong Promenade Bin A","松亭步道垃圾桶 A","부산 해운대구 송정해변로 산책로"],
+        ["songjeong",35.18005,129.20130,"송정 산책로 쓰레기통 B","Songjeong Promenade Bin B","松亭步道垃圾桶 B","부산 해운대구 송정해변로 산책로"],
+      ].map((x,i)=>({id:200+i,beach:x[0],cat:"trash",group:"basic",lat:x[1],lng:x[2],name:{ko:x[3],en:x[4],zh:x[5]},desc:{ko:"실제 위치 확인 전의 가상 생성 정보입니다.",en:"Virtual placeholder pending on-site verification.",zh:"这是等待现场核实的虚拟占位信息。"},address:{ko:x[6],en:x[6],zh:x[6]},verified:false,source:"Demo",rating:4,crowd:"normal",cost:0}));
+      P.push(...verifiedPlaces, ...mockTrash);
       const tr = {
         ko: {
           hero: "해변의 모든 편의를\n한눈에, 더 가볍게",
@@ -1017,6 +1097,11 @@
           basic: "기본 편의시설",
           care: "케어·대여시설",
           risk: "위험 요소",
+          storeFilter: "편의점", trashFilter: "쓰레기통", parkingFilter: "주차장", toiletFilter: "화장실",
+          showerFilter: "샤워실 · 세족장", rentalFilter: "레저용품 대여점", clinicFilter: "의무실",
+          marineRiskFilter: "해파리 · 이안류", healthRiskFilter: "인파 급증 · 폭염",
+          mockBadge: "⚠️ 모의 데이터", address: "주소", source: "데이터 출처",
+          youHere: "현재 위치",
           hint: "핀을 누르면 상세 정보와 현재 위치 기준 거리를 확인할 수 있습니다.",
           rank: "최적 장소 스마트 순위",
           parking: "🅿️ 주차장 순위",
@@ -1051,6 +1136,11 @@
           basic: "Basic amenities",
           care: "Care & rentals",
           risk: "Safety risks",
+          storeFilter: "Convenience stores", trashFilter: "Waste bins", parkingFilter: "Parking", toiletFilter: "Restrooms",
+          showerFilter: "Showers · foot wash", rentalFilter: "Leisure rentals", clinicFilter: "First aid",
+          marineRiskFilter: "Jellyfish · rip currents", healthRiskFilter: "Crowds · heat alerts",
+          mockBadge: "⚠️ Demo data", address: "Address", source: "Data source",
+          youHere: "You are here",
           hint: "Select a pin to see details and distance from your current location.",
           rank: "Smart best-place ranking",
           parking: "🅿️ Parking",
@@ -1090,6 +1180,11 @@
           basic: "基本便利设施",
           care: "护理与租赁设施",
           risk: "危险因素",
+          storeFilter: "便利店", trashFilter: "垃圾桶", parkingFilter: "停车场", toiletFilter: "卫生间",
+          showerFilter: "淋浴 · 洗脚处", rentalFilter: "休闲用品租赁", clinicFilter: "医务室",
+          marineRiskFilter: "水母 · 离岸流", healthRiskFilter: "人群激增 · 高温警报",
+          mockBadge: "⚠️ 模拟数据", address: "地址", source: "数据来源",
+          youHere: "当前位置",
           hint: "点击标记可查看详细信息及距当前位置的距离。",
           rank: "最佳地点智能排名",
           parking: "🅿️ 停车场排名",
@@ -1140,9 +1235,9 @@
       }
       function categoryName(c) {
         const labels = {
-          ko: { parking: "주차장", store: "편의점", toilet: "화장실", care: "샤워·세족·의무", rental: "대여시설", risk: "위험요소" },
-          en: { parking: "Parking", store: "Convenience store", toilet: "Restroom", care: "Shower · care", rental: "Rental", risk: "Safety risk" },
-          zh: { parking: "停车场", store: "便利店", toilet: "卫生间", care: "淋浴·护理", rental: "租赁设施", risk: "危险因素" },
+          ko: { parking: "주차장", store: "편의점", trash: "쓰레기통", toilet: "화장실", care: "샤워·세족장", clinic: "의무실", rental: "대여시설", risk: "위험요소" },
+          en: { parking: "Parking", store: "Convenience store", trash: "Waste bin", toilet: "Restroom", care: "Shower · foot wash", clinic: "First aid", rental: "Rental", risk: "Safety risk" },
+          zh: { parking: "停车场", store: "便利店", trash: "垃圾桶", toilet: "卫生间", care: "淋浴·洗脚处", clinic: "医务室", rental: "租赁设施", risk: "危险因素" },
         };
         return labels[lang][c];
       }
@@ -1169,24 +1264,32 @@
       function pinColor(g) {
         return g === "basic" ? "#178fe5" : g === "care" ? "#f1b928" : "#e94c44";
       }
+      function subKey(p) {
+        if (["store", "trash", "parking", "toilet", "rental"].includes(p.cat)) return p.cat;
+        if (p.cat === "clinic") return "clinic";
+        if (p.cat === "care") return p.name.ko.includes("의무") ? "clinic" : "shower";
+        if (p.cat === "risk") return /인파|폭염|Crowd|Heat|人群|高温/.test(Object.values(p.name).join(" ")) ? "healthRisk" : "marineRisk";
+        return p.cat;
+      }
       function icon(p) {
         return L.divIcon({
           className: "",
-          html: `<div class="pin" style="background:${pinColor(p.group)}"><span>${p.cat === "parking" ? "P" : p.cat === "store" ? "🏪" : p.cat === "toilet" ? "🚻" : p.cat === "care" ? "✚" : p.cat === "rental" ? "🏄" : "!"}</span></div>`,
+          html: `<div class="pin" style="background:${pinColor(p.group)}"><span>${p.cat === "parking" ? "P" : p.cat === "store" ? "🏪" : p.cat === "trash" ? "🗑" : p.cat === "toilet" ? "🚻" : p.cat === "care" ? "🚿" : p.cat === "clinic" ? "✚" : p.cat === "rental" ? "🏄" : "!"}</span></div>`,
           iconSize: [32, 32],
           iconAnchor: [16, 32],
         });
       }
       function popup(p) {
-        return `<div class="popup-title">${name(p)}</div><span class="popup-cat" style="background:${pinColor(p.group)}">${categoryName(p.cat)}</span><div class="popup-desc">${p.desc[lang]}</div><div class="popup-meta">📏 ${text("meters").replace("{n}", distance(p))} · ⭐ ${p.rating}<br>👥 ${crowdLabel(p.crowd)} · 💰 ${priceLabel(p)}</div>`;
+        const address = p.address?.[lang] || p.address?.ko || p.desc[lang];
+        const badge = p.verified === false ? `<div class="mock-badge">${text("mockBadge")}</div>` : "";
+        const source = p.source || (p.verified === false ? "Demo" : "BADANOW reference data");
+        return `${badge}<div class="popup-title">${name(p)}</div><span class="popup-cat" style="background:${pinColor(p.group)}">${categoryName(p.cat)}</span><div class="popup-desc">${p.desc[lang]}</div><div class="popup-address">📍 <b>${text("address")}</b><br>${address}<br><small>${text("source")}: ${source}</small></div><div class="popup-meta">📏 ${text("meters").replace("{n}", distance(p))} · ⭐ ${p.rating}<br>👥 ${crowdLabel(p.crowd)} · 💰 ${priceLabel(p)}</div>`;
       }
       function drawMarkers() {
         markers.forEach((x) => map.removeLayer(x.m));
         markers = [];
-        let enabled = [
-          ...document.querySelectorAll(".filter input:checked"),
-        ].map((x) => x.dataset.group);
-        P.filter((p) => p.beach === beach && enabled.includes(p.group)).forEach(
+        let enabled = [...document.querySelectorAll("[data-sub]:checked")].map((x) => x.dataset.sub);
+        P.filter((p) => p.beach === beach && enabled.includes(subKey(p))).forEach(
           (p) => {
             let m = L.marker([p.lat, p.lng], { icon: icon(p) })
               .addTo(map)
@@ -1240,9 +1343,7 @@
         mapTitle.textContent = t.map;
         locateBtn.textContent = t.loc;
         filterTitle.textContent = t.filter;
-        filterBasic.textContent = t.basic;
-        filterCare.textContent = t.care;
-        filterRisk.textContent = t.risk;
+        document.querySelectorAll("[data-i18n]").forEach((el) => el.textContent = t[el.dataset.i18n]);
         mapHint.textContent = t.hint;
         rankTitle.textContent = t.rank;
         footerText.textContent = t.footer;
@@ -1274,9 +1375,21 @@
         map.flyTo(beaches[k].center, beaches[k].zoom);
         render();
       }
-      document
-        .querySelectorAll(".filter input")
-        .forEach((x) => x.addEventListener("change", drawMarkers));
+      document.querySelectorAll(".filter-group").forEach((group) => {
+        const master = group.querySelector(".master input");
+        const children = [...group.querySelectorAll("[data-sub]")];
+        master.addEventListener("change", () => {
+          children.forEach((child) => child.checked = master.checked);
+          master.indeterminate = false;
+          drawMarkers();
+        });
+        children.forEach((child) => child.addEventListener("change", () => {
+          const checked = children.filter((item) => item.checked).length;
+          master.checked = checked === children.length;
+          master.indeterminate = checked > 0 && checked < children.length;
+          drawMarkers();
+        }));
+      });
       languageSelect.onchange = (e) => {
         lang = e.target.value;
         document.documentElement.lang = lang;
@@ -1295,7 +1408,7 @@
               fillOpacity: 1,
             })
               .addTo(map)
-              .bindPopup("You are here");
+              .bindPopup(text("youHere"));
             locateBtn.textContent = text("loc");
             rankPlaces();
             drawMarkers();
