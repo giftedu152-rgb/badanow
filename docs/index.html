@@ -1150,6 +1150,27 @@
         ["songjeong",35.18005,129.20130,"송정 산책로 쓰레기통 B","Songjeong Promenade Bin B","松亭步道垃圾桶 B","부산 해운대구 송정해변로 산책로"],
       ].map((x,i)=>({id:200+i,beach:x[0],cat:"trash",group:"basic",lat:x[1],lng:x[2],name:{ko:x[3],en:x[4],zh:x[5]},desc:{ko:"실제 위치 확인 전의 가상 생성 정보입니다.",en:"Virtual placeholder pending on-site verification.",zh:"这是等待现场核实的虚拟占位信息。"},address:{ko:x[6],en:x[6],zh:x[6]},verified:false,source:"Demo",rating:4,crowd:"normal",cost:0}));
       P.push(...verifiedPlaces, ...mockTrash);
+      // Mock pins intentionally follow known road / promenade-side locations, never the sand or sea.
+      const mockLandCoordinates = {
+        gwangan: [
+          [35.1515898,129.1159109],[35.1527733,129.1176276],[35.1529536,129.1177742],[35.1538419,129.1186734],[35.1543491,129.1238725],
+          [35.1547461,129.1276729],[35.1566766,129.1163707],[35.1593091,129.1208684],[35.1602339,129.1146496],[35.1611239,129.1208727],
+        ],
+        haeundae: [
+          [35.1576925,129.1558940],[35.1584198,129.1557890],[35.1585710,129.1579248],[35.1589254,129.1597873],[35.1598170,129.1579200],
+          [35.1601638,129.1620761],[35.1604006,129.1580229],[35.1605036,129.1622200],[35.1618401,129.1636151],[35.1635963,129.1615592],
+        ],
+        songjeong: [
+          [35.1762134,129.1971260],[35.1767200,129.1976000],[35.1771800,129.1980500],[35.1776500,129.1985000],[35.1781200,129.1989500],
+          [35.1785900,129.1994000],[35.1790600,129.1998500],[35.1795300,129.2003000],[35.1800000,129.2010000],[35.1802900,129.2021090],
+        ],
+      };
+      Object.entries(mockLandCoordinates).forEach(([beachId, points]) => {
+        P.filter((p) => p.beach === beachId && p.verified === false).forEach((p, index) => {
+          const point = points[index];
+          if (point) { p.lat = point[0]; p.lng = point[1]; }
+        });
+      });
       const tr = {
         ko: {
           hero: "해변의 모든 편의를\n한눈에, 더 가볍게",
