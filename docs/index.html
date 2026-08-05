@@ -1238,6 +1238,7 @@
           storeFilter: "편의점", trashFilter: "쓰레기통", parkingFilter: "주차장", toiletFilter: "화장실",
           showerFilter: "샤워실 · 세족장", rentalFilter: "레저용품 대여점", clinicFilter: "의무실",
           marineRiskFilter: "해파리 · 이안류", healthRiskFilter: "인파 급증 · 폭염",
+          crowdZoneTitle: "🚨 인파 밀집 주의 구역", crowdZoneArea: "중앙 백사장 구역", crowdZoneStatus: "🔴 매우 혼잡 (쾌적도 15%)", crowdZoneDesc: "현재 피서객 몰림 현상으로 인파가 매우 급증한 상태입니다. 여유로운 휴식을 원하시면 좌·우측 외곽 구역을 이용해 주세요.",
           mockBadge: "⚠️ 모의 데이터", address: "주소", source: "데이터 출처",
           youHere: "현재 위치",
           hint: "핀을 누르면 상세 정보와 현재 위치 기준 거리를 확인할 수 있습니다.",
@@ -1286,6 +1287,7 @@
           storeFilter: "Convenience stores", trashFilter: "Waste bins", parkingFilter: "Parking", toiletFilter: "Restrooms",
           showerFilter: "Showers · foot wash", rentalFilter: "Leisure rentals", clinicFilter: "First aid",
           marineRiskFilter: "Jellyfish · rip currents", healthRiskFilter: "Crowds · heat alerts",
+          crowdZoneTitle: "🚨 Dense crowd caution zone", crowdZoneArea: "central beach zone", crowdZoneStatus: "🔴 Very busy (comfort 15%)", crowdZoneDesc: "Visitors are currently concentrated here. For a quieter break, use the outer areas to the left or right.",
           mockBadge: "⚠️ Demo data", address: "Address", source: "Data source",
           youHere: "You are here",
           hint: "Select a pin to see details and distance from your current location.",
@@ -1339,6 +1341,7 @@
           storeFilter: "便利店", trashFilter: "垃圾桶", parkingFilter: "停车场", toiletFilter: "卫生间",
           showerFilter: "淋浴 · 洗脚处", rentalFilter: "休闲用品租赁", clinicFilter: "医务室",
           marineRiskFilter: "水母 · 离岸流", healthRiskFilter: "人群激增 · 高温警报",
+          crowdZoneTitle: "🚨 人群密集注意区域", crowdZoneArea: "中央海滩区域", crowdZoneStatus: "🔴 非常拥挤（舒适度 15%）", crowdZoneDesc: "目前游客集中，人员明显增多。如需更舒适的休息，请使用左右两侧的外围区域。",
           mockBadge: "⚠️ 模拟数据", address: "地址", source: "数据来源",
           youHere: "当前位置",
           hint: "点击标记可查看详细信息及距当前位置的距离。",
@@ -1383,6 +1386,19 @@
         maxZoom: 19,
         attribution: "© OpenStreetMap",
       }).addTo(map);
+      const crowdZones = {
+        gwangan: [[35.15270,129.11720],[35.15340,129.11785],[35.15385,129.11950],[35.15310,129.12010]],
+        haeundae: [[35.15800,129.15860],[35.15885,129.15905],[35.15915,129.16130],[35.15830,129.16165]],
+        songjeong: [[35.17780,129.19845],[35.17855,129.19905],[35.17905,129.20050],[35.17825,129.20095]],
+      };
+      let crowdLayer = null;
+      function drawCrowdZone() {
+        if (crowdLayer) { map.removeLayer(crowdLayer); crowdLayer = null; }
+        if (!document.querySelector('[data-sub="healthRisk"]:checked')) return;
+        crowdLayer = L.polygon(crowdZones[beach], { color: "#d62f2f", weight: 2, dashArray: "7 6", fillColor: "#ef3f3f", fillOpacity: .28 })
+          .addTo(map)
+          .bindPopup(() => `<div class="popup-title">${text("crowdZoneTitle")}<br><small>${beaches[beach].n[lang]} ${text("crowdZoneArea")}</small></div><div class="popup-desc"><b>${text("crowdZoneStatus")}</b><br><br>${text("crowdZoneDesc")}</div>`);
+      }
       function text(k) {
         return tr[lang][k];
       }
@@ -1456,6 +1472,7 @@
             markers.push({ p, m });
           },
         );
+        drawCrowdZone();
       }
       function score(p) {
         let d = Math.min(distance(p), 1500),
