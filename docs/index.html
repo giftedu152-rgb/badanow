@@ -1503,21 +1503,21 @@
         const copy = {
           ko: {
             swim: `🌊 파고 ${c.wave}m · 🌡️ 수온 ${c.water}°C · 👥 ${crowdLabel(c.crowd)}`,
-            fishing: `🎣 낚시 접근성 · 🅿️ 주차 편의 · 🏪 주변 편의시설 반영`,
+            fishing: `🎣 낚시 접근성 · 🅿️ 주차 편의`,
             beginner: `🌊 파고 ${c.wave}m · 💨 풍속 ${c.wind}m/s · 🏄 대여점 ${rentals}곳`,
             advanced: `🌊 파고 ${c.wave}m · 💨 풍속 ${c.wind}m/s · 파도 조건 반영`,
-            walk: `🚶 보행로·수변 경관 · 🏪 편의시설 · 👥 ${crowdLabel(c.crowd)} 반영`,
+            walk: `🚶 보행로·수변 경관 · 🏪 편의시설 · 👥 ${crowdLabel(c.crowd)}`,
           },
           en: {
             swim: `🌊 ${c.wave}m wave · 🌡️ ${c.water}°C water · 👥 ${crowdLabel(c.crowd)}`,
-            fishing: `🎣 fishing access · 🅿️ parking · 🏪 nearby amenities`,
+            fishing: `🎣 fishing access · 🅿️ parking`,
             beginner: `🌊 ${c.wave}m wave · 💨 ${c.wind}m/s wind · 🏄 ${rentals} rental spots`,
             advanced: `🌊 ${c.wave}m wave · 💨 ${c.wind}m/s wind · wave conditions`,
             walk: `🚶 promenade & views · 🏪 amenities · 👥 ${crowdLabel(c.crowd)}`,
           },
           zh: {
             swim: `🌊 浪高 ${c.wave}m · 🌡️ 水温 ${c.water}°C · 👥 ${crowdLabel(c.crowd)}`,
-            fishing: `🎣 钓鱼可达性 · 🅿️ 停车便利 · 🏪 周边设施`,
+            fishing: `🎣 钓鱼可达性 · 🅿️ 停车便利`,
             beginner: `🌊 浪高 ${c.wave}m · 💨 风速 ${c.wind}m/s · 🏄 ${rentals}处租赁点`,
             advanced: `🌊 浪高 ${c.wave}m · 💨 风速 ${c.wind}m/s · 综合浪况`,
             walk: `🚶 步道与景观 · 🏪 便利设施 · 👥 ${crowdLabel(c.crowd)}`,
@@ -1530,7 +1530,7 @@
         activityTabs.innerHTML = [["swim", text("swim")], ["fishing", text("fishing")], ["surfing", text("surfing")], ["walk", text("walk")]].map(([key, label]) => `<button class="activity-tab ${activity === key ? "on" : ""}" onclick="activity='${key}';renderActivityRanks()">${label}</button>`).join("");
         skillTabs.innerHTML = activity === "surfing" ? [["beginner", text("beginner")], ["advanced", text("advanced")]].map(([key,label]) => `<button class="skill-tab ${surfLevel === key ? "on" : ""}" onclick="surfLevel='${key}';renderActivityRanks()">${label}</button>`).join("") : "";
         const places = Object.keys(beaches).map((id) => ({ id, score: activityScore(id) })).sort((a,b) => b.score - a.score);
-        activityRanks.innerHTML = places.map((entry, index) => `<article class="activity-rank-card"><div class="activity-medal">${["🥇", "🥈", "🥉"][index]}</div><div><h3>${index + 1}${lang === "ko" ? "위" : index + 1 + (index === 0 ? "st" : index === 1 ? "nd" : "rd")} ${beaches[entry.id].n[lang]} — ${text("recommendedBeach")}</h3><p>${activityReason(entry.id)}</p></div><div class="activity-score">${entry.score}<small>/100</small></div></article>`).join("");
+        activityRanks.innerHTML = places.map((entry, index) => `<article class="activity-rank-card"><div class="activity-medal">${["🥇", "🥈", "🥉"][index]}</div><div><h3>${beaches[entry.id].n[lang]}</h3><p>${activityReason(entry.id)}</p></div><div class="activity-score">${entry.score}<small>/100</small></div></article>`).join("");
       }
       function setView(mode) {
         viewMode = mode;
