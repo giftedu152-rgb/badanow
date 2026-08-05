@@ -215,6 +215,17 @@
       .crowd-pill.easy { background: #e1f3ff; color: #147ab5; }
       .crowd-pill.normal { background: #fff5cc; color: #8b6500; }
       .crowd-pill.busy { background: #ffe4e1; color: #be342c; }
+      .activity-panel { margin-top: 28px; }
+      .activity-tabs, .skill-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+      .activity-tab, .skill-tab { background: #fff; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-weight: 800; padding: 10px 13px; }
+      .activity-tab.on, .skill-tab.on { background: var(--navy); border-color: var(--navy); color: #fff; }
+      .skill-tabs { margin-top: 10px; }
+      .activity-ranks { display: grid; gap: 10px; margin-top: 16px; }
+      .activity-rank-card { align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: grid; gap: 12px; grid-template-columns: auto 1fr auto; padding: 15px; }
+      .activity-medal { font-size: 28px; }
+      .activity-rank-card h3 { margin: 0; font-size: 17px; }
+      .activity-rank-card p { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 5px 0 0; }
+      .activity-score { color: var(--blue); font-size: 20px; font-weight: 900; }
       .section-head {
         display: flex;
         align-items: end;
@@ -556,6 +567,8 @@
           grid-template-columns: auto 1fr;
         }
         .compare-grid { grid-template-columns: 1fr; }
+        .activity-rank-card { grid-template-columns: auto 1fr; }
+        .activity-score { grid-column: 2; }
         .score {
           grid-column: 2;
           text-align: left;
@@ -665,6 +678,17 @@
             </div>
           </div>
           <div class="compare-grid" id="compareGrid"></div>
+          <div class="activity-panel">
+            <div class="section-head">
+              <div>
+                <div class="eyebrow">ACTIVITY PICK</div>
+                <h2 id="activityTitle"></h2>
+              </div>
+            </div>
+            <div class="activity-tabs" id="activityTabs"></div>
+            <div class="skill-tabs" id="skillTabs"></div>
+            <div class="activity-ranks" id="activityRanks"></div>
+          </div>
         </section>
       </div>
     </main>
@@ -1186,6 +1210,11 @@
         haeundae: { water: 22, wave: 0.5, wind: 3.8, air: 28, crowd: "normal" },
         songjeong: { water: 22, wave: 0.7, wind: 4.2, air: 27, crowd: "easy" },
       };
+      const beachActivityTraits = {
+        gwangan: { fishing: 62, beginner: 64, advanced: 55, walk: 98 },
+        haeundae: { fishing: 68, beginner: 73, advanced: 78, walk: 86 },
+        songjeong: { fishing: 96, beginner: 98, advanced: 94, walk: 76 },
+      };
       const tr = {
         ko: {
           hero: "해변의 모든 편의를\n한눈에, 더 가볍게",
@@ -1197,6 +1226,9 @@
           compare: "해변 종합 비교",
           seaTemp: "해수 온도", wave: "최고 파고", wind: "풍속", airTemp: "기온",
           locationNeeded: "위치 사용 후 표시",
+          activityTitle: "🎯 액티비티별 추천 해변 순위",
+          swim: "🏊‍♂️ 물놀이", fishing: "🎣 낚시", surfing: "🏄‍♀️ 서핑", walk: "🚶‍♂️ 산책",
+          beginner: "초보자용", advanced: "숙련자용", recommendedBeach: "추천 해변",
           loc: "⌖ 내 위치 사용",
           filter: "지도 핀 필터",
           basic: "기본 편의시설",
@@ -1241,6 +1273,9 @@
           compare: "Beach comparison",
           seaTemp: "Water temperature", wave: "Max wave", wind: "Wind speed", airTemp: "Air temperature",
           locationNeeded: "Enable location to view",
+          activityTitle: "🎯 Recommended beaches by activity",
+          swim: "🏊‍♂️ Swimming", fishing: "🎣 Fishing", surfing: "🏄‍♀️ Surfing", walk: "🚶‍♂️ Walking",
+          beginner: "Beginner", advanced: "Advanced", recommendedBeach: "Recommended beach",
           loc: "⌖ Use my location",
           filter: "Map pin filters",
           basic: "Basic amenities",
@@ -1290,6 +1325,9 @@
           compare: "海滩综合比较",
           seaTemp: "海水温度", wave: "最高浪高", wind: "风速", airTemp: "气温",
           locationNeeded: "启用位置后显示",
+          activityTitle: "🎯 按活动推荐海滩排名",
+          swim: "🏊‍♂️ 游泳", fishing: "🎣 钓鱼", surfing: "🏄‍♀️ 冲浪", walk: "🚶‍♂️ 散步",
+          beginner: "初学者", advanced: "熟练者", recommendedBeach: "推荐海滩",
           loc: "⌖ 使用我的位置",
           filter: "地图标记筛选",
           basic: "基本便利设施",
@@ -1329,6 +1367,8 @@
         beach = "gwangan",
         rankCat = "parking",
         viewMode = "map",
+        activity = "swim",
+        surfLevel = "beginner",
         userPos = null,
         markers = [];
       const map = L.map("map", { zoomControl: false }).setView(
@@ -1443,6 +1483,55 @@
           return `<article class="compare-card"><div class="compare-card-head"><h3>${item.n[lang]}</h3><span class="compare-distance">📍 ${km}</span></div><div class="compare-stats"><div class="compare-stat"><span>🌡️ ${text("seaTemp")}</span><b>${c.water}°C</b></div><div class="compare-stat"><span>🌊 ${text("wave")}</span><b>${c.wave}m</b></div><div class="compare-stat"><span>💨 ${text("wind")}</span><b>${c.wind}m/s</b></div><div class="compare-stat"><span>☀️ ${text("airTemp")}</span><b>${c.air}°C</b></div><div class="compare-stat"><span>👥 ${text("crowd")}</span><span class="crowd-pill ${c.crowd}">${crowdLabel(c.crowd)}</span></div></div></article>`;
         }).join("");
       }
+      function activityScore(beachId) {
+        const c = beachConditions[beachId];
+        const traits = beachActivityTraits[beachId];
+        const places = P.filter((p) => p.beach === beachId);
+        const parking = places.filter((p) => p.cat === "parking").length;
+        const stores = places.filter((p) => p.cat === "store").length;
+        const rentals = places.filter((p) => p.cat === "rental").length;
+        const crowd = { easy: 16, normal: 12, busy: 7 }[c.crowd];
+        if (activity === "swim") return Math.min(100, Math.round(35 * Math.max(0, 1 - c.wave / 1.2) + 28 * Math.max(0, 1 - Math.abs(c.water - 23) / 6) + crowd + stores * 2));
+        if (activity === "fishing") return Math.min(100, Math.round(traits.fishing * .7 + Math.min(parking, 4) * 5 + Math.min(stores, 5) * 2));
+        if (activity === "surfing" && surfLevel === "beginner") return Math.min(100, Math.round(42 * Math.max(0, 1 - Math.abs(c.wave - .7) / 1) + 22 * Math.max(0, 1 - Math.abs(c.wind - 4) / 5) + traits.beginner * .35 + rentals * 3));
+        if (activity === "surfing") return Math.min(100, Math.round(c.wave * 30 + c.wind * 7 + traits.advanced * .45 + rentals * 2));
+        return Math.min(100, Math.round(traits.walk * .62 + Math.min(stores, 5) * 5 + Math.min(parking, 4) * 2 + crowd * .45));
+      }
+      function activityReason(beachId) {
+        const c = beachConditions[beachId];
+        const rentals = P.filter((p) => p.beach === beachId && p.cat === "rental").length;
+        const copy = {
+          ko: {
+            swim: `🌊 파고 ${c.wave}m · 🌡️ 수온 ${c.water}°C · 👥 ${crowdLabel(c.crowd)}`,
+            fishing: `🎣 낚시 접근성 · 🅿️ 주차 편의 · 🏪 주변 편의시설 반영`,
+            beginner: `🌊 파고 ${c.wave}m · 💨 풍속 ${c.wind}m/s · 🏄 대여점 ${rentals}곳`,
+            advanced: `🌊 파고 ${c.wave}m · 💨 풍속 ${c.wind}m/s · 파도 조건 반영`,
+            walk: `🚶 보행로·수변 경관 · 🏪 편의시설 · 👥 ${crowdLabel(c.crowd)} 반영`,
+          },
+          en: {
+            swim: `🌊 ${c.wave}m wave · 🌡️ ${c.water}°C water · 👥 ${crowdLabel(c.crowd)}`,
+            fishing: `🎣 fishing access · 🅿️ parking · 🏪 nearby amenities`,
+            beginner: `🌊 ${c.wave}m wave · 💨 ${c.wind}m/s wind · 🏄 ${rentals} rental spots`,
+            advanced: `🌊 ${c.wave}m wave · 💨 ${c.wind}m/s wind · wave conditions`,
+            walk: `🚶 promenade & views · 🏪 amenities · 👥 ${crowdLabel(c.crowd)}`,
+          },
+          zh: {
+            swim: `🌊 浪高 ${c.wave}m · 🌡️ 水温 ${c.water}°C · 👥 ${crowdLabel(c.crowd)}`,
+            fishing: `🎣 钓鱼可达性 · 🅿️ 停车便利 · 🏪 周边设施`,
+            beginner: `🌊 浪高 ${c.wave}m · 💨 风速 ${c.wind}m/s · 🏄 ${rentals}处租赁点`,
+            advanced: `🌊 浪高 ${c.wave}m · 💨 风速 ${c.wind}m/s · 综合浪况`,
+            walk: `🚶 步道与景观 · 🏪 便利设施 · 👥 ${crowdLabel(c.crowd)}`,
+          },
+        };
+        return copy[lang][activity === "surfing" ? surfLevel : activity];
+      }
+      function renderActivityRanks() {
+        activityTitle.textContent = text("activityTitle");
+        activityTabs.innerHTML = [["swim", text("swim")], ["fishing", text("fishing")], ["surfing", text("surfing")], ["walk", text("walk")]].map(([key, label]) => `<button class="activity-tab ${activity === key ? "on" : ""}" onclick="activity='${key}';renderActivityRanks()">${label}</button>`).join("");
+        skillTabs.innerHTML = activity === "surfing" ? [["beginner", text("beginner")], ["advanced", text("advanced")]].map(([key,label]) => `<button class="skill-tab ${surfLevel === key ? "on" : ""}" onclick="surfLevel='${key}';renderActivityRanks()">${label}</button>`).join("") : "";
+        const places = Object.keys(beaches).map((id) => ({ id, score: activityScore(id) })).sort((a,b) => b.score - a.score);
+        activityRanks.innerHTML = places.map((entry, index) => `<article class="activity-rank-card"><div class="activity-medal">${["🥇", "🥈", "🥉"][index]}</div><div><h3>${index + 1}${lang === "ko" ? "위" : index + 1 + (index === 0 ? "st" : index === 1 ? "nd" : "rd")} ${beaches[entry.id].n[lang]} — ${text("recommendedBeach")}</h3><p>${activityReason(entry.id)}</p></div><div class="activity-score">${entry.score}<small>/100</small></div></article>`).join("");
+      }
       function setView(mode) {
         viewMode = mode;
         render();
@@ -1504,6 +1593,7 @@
         drawMarkers();
         rankPlaces();
         renderComparison();
+        renderActivityRanks();
       }
       function switchBeach(k) {
         beach = k;
