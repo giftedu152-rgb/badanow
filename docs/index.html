@@ -137,17 +137,18 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 10px;
-        margin-top: -26px;
+        margin-top: 18px;
         position: relative;
-        z-index: 3;
+        z-index: 2;
       }
+      main.shell { padding-top: 28px; }
       .mode-switcher {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
-        margin-top: -27px;
+        margin-top: 0;
         position: relative;
-        z-index: 4;
+        z-index: 3;
       }
       .mode-btn {
         background: #ffffffec;
@@ -169,6 +170,8 @@
       }
       .view-panel {
         animation: viewIn .32s ease both;
+        position: relative;
+        z-index: 1;
       }
       .view-panel[hidden] { display: none; }
       @keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -632,6 +635,20 @@
           <div class="map-hint" id="mapHint"></div>
         </div>
         </section>
+        <section class="section" id="smartRankingSection">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">SMART RANKING</div>
+              <h2 id="rankTitle"></h2>
+            </div>
+          </div>
+          <div class="smart-panel">
+            <div class="rank-tabs" id="rankTabs"></div>
+            <div class="algorithm" id="algorithm"></div>
+            <div class="rank-list" id="rankList"></div>
+            <p class="disclaimer" id="disclaimer"></p>
+          </div>
+        </section>
       </div>
       <div id="rankingView" class="view-panel" hidden>
         <section class="section">
@@ -642,20 +659,6 @@
             </div>
           </div>
           <div class="compare-grid" id="compareGrid"></div>
-        </section>
-        <section class="section">
-        <div class="section-head">
-          <div>
-            <div class="eyebrow">SMART RANKING</div>
-            <h2 id="rankTitle"></h2>
-          </div>
-        </div>
-        <div class="smart-panel">
-          <div class="rank-tabs" id="rankTabs"></div>
-          <div class="algorithm" id="algorithm"></div>
-          <div class="rank-list" id="rankList"></div>
-          <p class="disclaimer" id="disclaimer"></p>
-        </div>
         </section>
       </div>
     </main>
