@@ -141,6 +141,37 @@
         position: relative;
         z-index: 3;
       }
+      .mode-switcher {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: -27px;
+        position: relative;
+        z-index: 4;
+      }
+      .mode-btn {
+        background: #ffffffec;
+        border: 1px solid #cfe0ea;
+        border-radius: 17px;
+        box-shadow: var(--shadow);
+        color: #426071;
+        font-size: 16px;
+        font-weight: 850;
+        padding: 18px;
+        transition: transform .22s ease, background .22s ease, color .22s ease, box-shadow .22s ease;
+      }
+      .mode-btn:hover { transform: translateY(-2px); }
+      .mode-btn.on {
+        background: linear-gradient(135deg, var(--navy), var(--blue));
+        border-color: transparent;
+        box-shadow: 0 13px 28px #06367135;
+        color: #fff;
+      }
+      .view-panel {
+        animation: viewIn .32s ease both;
+      }
+      .view-panel[hidden] { display: none; }
+      @keyframes viewIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
       .beach-tab {
         background: #fff;
         border: 1px solid var(--line);
@@ -159,6 +190,22 @@
       .section {
         padding: 34px 0;
       }
+      .compare-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .compare-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 19px;
+        box-shadow: var(--shadow);
+        padding: 18px;
+      }
+      .compare-card h3 { margin: 0 0 12px; font-size: 19px; }
+      .compare-card p { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 8px 0; }
+      .compare-stats { display: grid; gap: 8px; }
+      .compare-stat { background: #f4f9fc; border-radius: 10px; font-size: 12px; padding: 9px; }
       .section-head {
         display: flex;
         align-items: end;
@@ -460,6 +507,8 @@
         .beach-tabs {
           gap: 7px;
         }
+        .mode-switcher { gap: 7px; }
+        .mode-btn { font-size: 14px; padding: 15px 9px; }
         .beach-tab {
           padding: 13px 7px;
           font-size: 13px;
@@ -497,6 +546,7 @@
         .rank-card {
           grid-template-columns: auto 1fr;
         }
+        .compare-grid { grid-template-columns: 1fr; }
         .score {
           grid-column: 2;
           text-align: left;
@@ -539,8 +589,10 @@
       </div>
     </header>
     <main class="shell">
-      <div class="beach-tabs" id="beachTabs"></div>
-      <section class="section">
+      <div class="mode-switcher" id="modeSwitcher"></div>
+      <div id="mapView" class="view-panel">
+        <div class="beach-tabs" id="beachTabs"></div>
+        <section class="section">
         <div class="section-head">
           <div>
             <div class="eyebrow">BEACH MAP</div>
@@ -579,8 +631,19 @@
           <div id="map"></div>
           <div class="map-hint" id="mapHint"></div>
         </div>
-      </section>
-      <section class="section">
+        </section>
+      </div>
+      <div id="rankingView" class="view-panel" hidden>
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">BEACH OVERVIEW</div>
+              <h2 id="compareTitle"></h2>
+            </div>
+          </div>
+          <div class="compare-grid" id="compareGrid"></div>
+        </section>
+        <section class="section">
         <div class="section-head">
           <div>
             <div class="eyebrow">SMART RANKING</div>
@@ -593,7 +656,8 @@
           <div class="rank-list" id="rankList"></div>
           <p class="disclaimer" id="disclaimer"></p>
         </div>
-      </section>
+        </section>
+      </div>
     </main>
     <footer class="foot">
       <div class="shell">
@@ -1092,6 +1156,11 @@
           sub: "광안리·해운대·송정의 편의시설과 위험요소를 지도와 스마트 순위로 비교하세요.",
           mock: "ⓘ 장소 좌표는 공개 지도 기반이며 평점·혼잡도·스마트 점수는 기능 시연용 기준값입니다.",
           map: "해변 시설 지도",
+          mapMode: "🗺️ 지도 모드",
+          rankMode: "📊 해변 비교 & 순위 모드",
+          compare: "해변 종합 비교",
+          facilities: "주변 시설",
+          topPlace: "추천 1순위",
           loc: "⌖ 내 위치 사용",
           filter: "지도 핀 필터",
           basic: "기본 편의시설",
@@ -1131,6 +1200,11 @@
           sub: "Compare amenities and safety points at Gwangalli, Haeundae and Songjeong on one smart map.",
           mock: "ⓘ Coordinates are based on public maps; ratings, crowd levels and smart scores are demo values.",
           map: "Beach facility map",
+          mapMode: "🗺️ Map mode",
+          rankMode: "📊 Beach comparison & ranking",
+          compare: "Beach comparison",
+          facilities: "Nearby facilities",
+          topPlace: "Top recommendation",
           loc: "⌖ Use my location",
           filter: "Map pin filters",
           basic: "Basic amenities",
@@ -1175,6 +1249,11 @@
           sub: "在智能地图上比较广安里、海云台与松亭的便利设施和安全信息。",
           mock: "ⓘ 地点坐标基于公开地图；评分、拥挤度和智能分数为功能演示数据。",
           map: "海滩设施地图",
+          mapMode: "🗺️ 地图模式",
+          rankMode: "📊 海滩比较与排名模式",
+          compare: "海滩综合比较",
+          facilities: "周边设施",
+          topPlace: "首选推荐",
           loc: "⌖ 使用我的位置",
           filter: "地图标记筛选",
           basic: "基本便利设施",
@@ -1213,6 +1292,7 @@
       let lang = "ko",
         beach = "gwangan",
         rankCat = "parking",
+        viewMode = "map",
         userPos = null,
         markers = [];
       const map = L.map("map", { zoomControl: false }).setView(
@@ -1319,8 +1399,26 @@
             )
             .join("") || `<p class="disclaimer">${text("unknown")}</p>`;
       }
+      function renderComparison() {
+        compareTitle.textContent = text("compare");
+        compareGrid.innerHTML = Object.entries(beaches).map(([key, item]) => {
+          const places = P.filter((p) => p.beach === key);
+          const parking = places.filter((p) => p.cat === "parking").length;
+          const stores = places.filter((p) => p.cat === "store").length;
+          const care = places.filter((p) => ["care", "rental", "toilet", "clinic"].includes(p.cat)).length;
+          const top = [...places].sort((a, b) => b.rating - a.rating)[0];
+          return `<article class="compare-card"><h3>${item.n[lang]}</h3><p>${text("facilities")}</p><div class="compare-stats"><div class="compare-stat">🅿️ ${text("parking")}: ${parking}</div><div class="compare-stat">🏪 ${text("store")}: ${stores}</div><div class="compare-stat">🚿 ${text("careTab")}: ${care}</div><div class="compare-stat">⭐ ${text("topPlace")}: ${top ? name(top) : text("unknown")}</div></div></article>`;
+        }).join("");
+      }
+      function setView(mode) {
+        viewMode = mode;
+        render();
+        if (mode === "map") setTimeout(() => map.invalidateSize(), 350);
+      }
       function showPin(id) {
         let p = P.find((x) => x.id === id);
+        beach = p.beach;
+        if (viewMode !== "map") setView("map");
         map.setView([p.lat, p.lng], 18);
         let found = markers.find((x) => x.p.id === id);
         if (!found) {
@@ -1337,6 +1435,9 @@
       }
       function render() {
         let t = tr[lang];
+        modeSwitcher.innerHTML = `<button class="mode-btn ${viewMode === "map" ? "on" : ""}" onclick="setView('map')">${t.mapMode}</button><button class="mode-btn ${viewMode === "ranking" ? "on" : ""}" onclick="setView('ranking')">${t.rankMode}</button>`;
+        mapView.hidden = viewMode !== "map";
+        rankingView.hidden = viewMode !== "ranking";
         heroTitle.innerHTML = t.hero.replace("\n", "<br>");
         heroSub.textContent = t.sub;
         mockNote.textContent = t.mock;
@@ -1369,6 +1470,7 @@
         disclaimer.textContent = t.disc;
         drawMarkers();
         rankPlaces();
+        renderComparison();
       }
       function switchBeach(k) {
         beach = k;
