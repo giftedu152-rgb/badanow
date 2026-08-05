@@ -1500,38 +1500,50 @@
         if (activity === "surfing") return Math.min(100, Math.round(c.wave * 30 + c.wind * 7 + traits.advanced * .45 + rentals * 2));
         return Math.min(100, Math.round(traits.walk * .62 + Math.min(stores, 5) * 5 + Math.min(parking, 4) * 2 + crowd * .45));
       }
-      function activityReason(beachId) {
+      function activityReason(beachId, rank) {
+        const c = beachConditions[beachId];
+        const traits = beachActivityTraits[beachId];
+        const places = P.filter((p) => p.beach === beachId);
+        const parking = places.filter((p) => p.cat === "parking").length;
+        const stores = places.filter((p) => p.cat === "store").length;
+        const rentals = places.filter((p) => p.cat === "rental").length;
+        const key = activity === "surfing" ? surfLevel : activity;
+        const metrics = {
+          ko: { swim: `🌊 파고 ${c.wave}m · 🌡️ 수온 ${c.water}°C · 👥 ${crowdLabel(c.crowd)}`, fishing: `🎣 접근성 ${traits.fishing}점 · 🅿️ 주차장 ${parking}곳`, beginner: `🌊 파고 ${c.wave}m · 💨 풍속 ${c.wind}m/s · 🏄 대여점 ${rentals}곳`, advanced: `🌊 파고 ${c.wave}m · 💨 풍속 ${c.wind}m/s · 🏄 대여점 ${rentals}곳`, walk: `🚶 산책 환경 ${traits.walk}점 · 🏪 편의점 ${stores}곳 · 👥 ${crowdLabel(c.crowd)}` },
+          en: { swim: `🌊 ${c.wave}m wave · 🌡️ ${c.water}°C water · 👥 ${crowdLabel(c.crowd)}`, fishing: `🎣 access ${traits.fishing} pts · 🅿️ ${parking} parking areas`, beginner: `🌊 ${c.wave}m wave · 💨 ${c.wind}m/s wind · 🏄 ${rentals} rentals`, advanced: `🌊 ${c.wave}m wave · 💨 ${c.wind}m/s wind · 🏄 ${rentals} rentals`, walk: `🚶 walking ${traits.walk} pts · 🏪 ${stores} stores · 👥 ${crowdLabel(c.crowd)}` },
+          zh: { swim: `🌊 浪高 ${c.wave}m · 🌡️ 水温 ${c.water}°C · 👥 ${crowdLabel(c.crowd)}`, fishing: `🎣 可达性 ${traits.fishing}分 · 🅿️ ${parking}处停车场`, beginner: `🌊 浪高 ${c.wave}m · 💨 风速 ${c.wind}m/s · 🏄 ${rentals}处租赁点`, advanced: `🌊 浪高 ${c.wave}m · 💨 风速 ${c.wind}m/s · 🏄 ${rentals}处租赁点`, walk: `🚶 散步环境 ${traits.walk}分 · 🏪 ${stores}家便利店 · 👥 ${crowdLabel(c.crowd)}` },
+        };
         const copy = {
           ko: {
-            swim: "파도가 비교적 잔잔하고 수온이 적당해 물놀이에 알맞습니다.",
-            fishing: "낚시 접근성이 좋고 주차 이용이 편리합니다.",
-            beginner: "파도와 바람이 초보자에게 적당하고 대여 시설 이용이 편리합니다.",
-            advanced: "더 높은 파도와 바람 조건이 숙련자에게 유리합니다.",
-            walk: "수변 산책로와 편의시설 이용이 편리합니다.",
+            swim: ["잔잔한 파도와 적당한 수온이 가장 잘 맞습니다.", "수온은 쾌적하지만 파도가 조금 더 높습니다.", "혼잡도는 여유롭지만 파도 조건이 상대적으로 높습니다."],
+            fishing: ["낚시 접근성과 주차 편의가 가장 좋습니다.", "접근성은 좋지만 주차 여건이 조금 더 제한적입니다.", "주차 이용은 가능하지만 접근성 점수가 낮습니다."],
+            beginner: ["초보자에게 가장 안정적인 파도와 바람 조건입니다.", "입문에 적합하지만 파도 조건이 조금 더 강합니다.", "대여 시설은 편리하지만 초보 기준 바람이 다소 강합니다."],
+            advanced: ["숙련자에게 유리한 높은 파도와 바람 조건입니다.", "도전적인 파도 조건이지만 1위보다 강도가 낮습니다.", "파도는 즐길 수 있으나 숙련자 기준의 강도는 낮습니다."],
+            walk: ["수변 산책로와 주변 편의시설 이용이 가장 편리합니다.", "보행 환경이 좋고 주변 시설 접근성이 뛰어납니다.", "산책은 가능하지만 보행 환경 점수가 상대적으로 낮습니다."],
           },
           en: {
-            swim: "Gentler waves and a comfortable water temperature suit swimming.",
-            fishing: "Fishing access is good and parking is convenient.",
-            beginner: "The waves and wind are suitable for beginners, with convenient rentals.",
-            advanced: "Stronger waves and wind are more favorable for experienced surfers.",
-            walk: "The waterfront promenade and nearby amenities are convenient.",
+            swim: ["Its gentle waves and water temperature are the best match.", "The water is comfortable, but the waves are slightly higher.", "It is quieter, but wave conditions are relatively higher."],
+            fishing: ["It has the best fishing access and parking convenience.", "Access is good, but parking is more limited.", "Parking is available, but the access score is lower."],
+            beginner: ["It offers the most stable waves and wind for beginners.", "It suits learning, but conditions are slightly stronger.", "Rentals are convenient, but the wind is stronger for beginners."],
+            advanced: ["Higher waves and wind are favorable for experienced surfers.", "The waves are challenging, but less strong than the top choice.", "The waves are rideable, but less intense for advanced surfers."],
+            walk: ["Its waterfront promenade and amenities are the most convenient.", "It has a good walking environment and facility access.", "Walking is possible, but the environment score is relatively lower."],
           },
           zh: {
-            swim: "海浪较平稳，水温适宜游泳。",
-            fishing: "钓鱼可达性好，停车也很方便。",
-            beginner: "海浪和风力适合初学者，租赁设施也很方便。",
-            advanced: "更高的浪和风力条件更适合熟练冲浪者。",
-            walk: "滨水步道和周边便利设施使用方便。",
+            swim: ["平稳的海浪和适宜水温最符合游泳条件。", "水温舒适，但海浪稍高。", "较为空闲，但海浪条件相对较高。"],
+            fishing: ["钓鱼可达性和停车便利性最佳。", "可达性良好，但停车条件较有限。", "可以停车，但可达性评分较低。"],
+            beginner: ["为初学者提供最稳定的海浪和风力条件。", "适合入门，但条件稍强。", "租赁方便，但对初学者来说风力稍强。"],
+            advanced: ["较高的海浪和风力更有利于熟练冲浪者。", "海浪具有挑战性，但强度低于首选。", "可以冲浪，但对熟练者来说强度较低。"],
+            walk: ["滨水步道和周边设施使用最方便。", "步行环境良好，设施可达性也很高。", "可以散步，但环境评分相对较低。"],
           },
         };
-        return copy[lang][activity === "surfing" ? surfLevel : activity];
+        return `${metrics[lang][key]} — ${copy[lang][key][rank]}`;
       }
       function renderActivityRanks() {
         activityTitle.textContent = text("activityTitle");
         activityTabs.innerHTML = [["swim", text("swim")], ["fishing", text("fishing")], ["surfing", text("surfing")], ["walk", text("walk")]].map(([key, label]) => `<button class="activity-tab ${activity === key ? "on" : ""}" onclick="activity='${key}';renderActivityRanks()">${label}</button>`).join("");
         skillTabs.innerHTML = activity === "surfing" ? [["beginner", text("beginner")], ["advanced", text("advanced")]].map(([key,label]) => `<button class="skill-tab ${surfLevel === key ? "on" : ""}" onclick="surfLevel='${key}';renderActivityRanks()">${label}</button>`).join("") : "";
         const places = Object.keys(beaches).map((id) => ({ id, score: activityScore(id) })).sort((a,b) => b.score - a.score);
-        activityRanks.innerHTML = places.map((entry, index) => `<article class="activity-rank-card"><div class="activity-medal">${["🥇", "🥈", "🥉"][index]}</div><div><h3>${beaches[entry.id].n[lang]}</h3><p><b>${text("reasonLabel")}:</b> ${activityReason(entry.id)}</p></div><div class="activity-score">${entry.score}<small>/100</small></div></article>`).join("");
+        activityRanks.innerHTML = places.map((entry, index) => `<article class="activity-rank-card"><div class="activity-medal">${["🥇", "🥈", "🥉"][index]}</div><div><h3>${beaches[entry.id].n[lang]}</h3><p><b>${text("reasonLabel")}:</b> ${activityReason(entry.id, index)}</p></div><div class="activity-score">${entry.score}<small>/100</small></div></article>`).join("");
       }
       function setView(mode) {
         viewMode = mode;
