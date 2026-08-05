@@ -205,10 +205,16 @@
         box-shadow: var(--shadow);
         padding: 18px;
       }
-      .compare-card h3 { margin: 0 0 12px; font-size: 19px; }
-      .compare-card p { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 8px 0; }
+      .compare-card-head { align-items: baseline; display: flex; gap: 9px; justify-content: space-between; margin-bottom: 14px; }
+      .compare-card h3 { margin: 0; font-size: 20px; }
+      .compare-distance { color: var(--blue); font-size: 13px; font-weight: 800; white-space: nowrap; }
       .compare-stats { display: grid; gap: 8px; }
-      .compare-stat { background: #f4f9fc; border-radius: 10px; font-size: 12px; padding: 9px; }
+      .compare-stat { align-items: center; background: #f4f9fc; border-radius: 10px; display: flex; font-size: 13px; justify-content: space-between; padding: 10px; }
+      .compare-stat b { color: var(--ink); }
+      .crowd-pill { border-radius: 999px; font-size: 12px; font-weight: 800; padding: 4px 8px; }
+      .crowd-pill.easy { background: #e1f3ff; color: #147ab5; }
+      .crowd-pill.normal { background: #fff5cc; color: #8b6500; }
+      .crowd-pill.busy { background: #ffe4e1; color: #be342c; }
       .section-head {
         display: flex;
         align-items: end;
@@ -1174,6 +1180,12 @@
           if (point) { p.lat = point[0]; p.lng = point[1]; }
         });
       });
+      // Development demo values. Replace with official marine/weather API values when connected.
+      const beachConditions = {
+        gwangan: { water: 23, wave: 0.4, wind: 3.1, air: 29, crowd: "busy" },
+        haeundae: { water: 22, wave: 0.5, wind: 3.8, air: 28, crowd: "normal" },
+        songjeong: { water: 22, wave: 0.7, wind: 4.2, air: 27, crowd: "easy" },
+      };
       const tr = {
         ko: {
           hero: "해변의 모든 편의를\n한눈에, 더 가볍게",
@@ -1183,8 +1195,8 @@
           mapMode: "🗺️ 지도 모드",
           rankMode: "📊 해변 비교 & 순위 모드",
           compare: "해변 종합 비교",
-          facilities: "주변 시설",
-          topPlace: "추천 1순위",
+          seaTemp: "해수 온도", wave: "최고 파고", wind: "풍속", airTemp: "기온",
+          locationNeeded: "위치 사용 후 표시",
           loc: "⌖ 내 위치 사용",
           filter: "지도 핀 필터",
           basic: "기본 편의시설",
@@ -1227,8 +1239,8 @@
           mapMode: "🗺️ Map mode",
           rankMode: "📊 Beach comparison & ranking",
           compare: "Beach comparison",
-          facilities: "Nearby facilities",
-          topPlace: "Top recommendation",
+          seaTemp: "Water temperature", wave: "Max wave", wind: "Wind speed", airTemp: "Air temperature",
+          locationNeeded: "Enable location to view",
           loc: "⌖ Use my location",
           filter: "Map pin filters",
           basic: "Basic amenities",
@@ -1276,8 +1288,8 @@
           mapMode: "🗺️ 地图模式",
           rankMode: "📊 海滩比较与排名模式",
           compare: "海滩综合比较",
-          facilities: "周边设施",
-          topPlace: "首选推荐",
+          seaTemp: "海水温度", wave: "最高浪高", wind: "风速", airTemp: "气温",
+          locationNeeded: "启用位置后显示",
           loc: "⌖ 使用我的位置",
           filter: "地图标记筛选",
           basic: "基本便利设施",
@@ -1426,12 +1438,9 @@
       function renderComparison() {
         compareTitle.textContent = text("compare");
         compareGrid.innerHTML = Object.entries(beaches).map(([key, item]) => {
-          const places = P.filter((p) => p.beach === key);
-          const parking = places.filter((p) => p.cat === "parking").length;
-          const stores = places.filter((p) => p.cat === "store").length;
-          const care = places.filter((p) => ["care", "rental", "toilet", "clinic"].includes(p.cat)).length;
-          const top = [...places].sort((a, b) => b.rating - a.rating)[0];
-          return `<article class="compare-card"><h3>${item.n[lang]}</h3><p>${text("facilities")}</p><div class="compare-stats"><div class="compare-stat">🅿️ ${text("parking")}: ${parking}</div><div class="compare-stat">🏪 ${text("store")}: ${stores}</div><div class="compare-stat">🚿 ${text("careTab")}: ${care}</div><div class="compare-stat">⭐ ${text("topPlace")}: ${top ? name(top) : text("unknown")}</div></div></article>`;
+          const c = beachConditions[key];
+          const km = userPos ? (hav(userPos[0], userPos[1], item.center[0], item.center[1]) / 1000).toFixed(1) + "km" : text("locationNeeded");
+          return `<article class="compare-card"><div class="compare-card-head"><h3>${item.n[lang]}</h3><span class="compare-distance">📍 ${km}</span></div><div class="compare-stats"><div class="compare-stat"><span>🌡️ ${text("seaTemp")}</span><b>${c.water}°C</b></div><div class="compare-stat"><span>🌊 ${text("wave")}</span><b>${c.wave}m</b></div><div class="compare-stat"><span>💨 ${text("wind")}</span><b>${c.wind}m/s</b></div><div class="compare-stat"><span>☀️ ${text("airTemp")}</span><b>${c.air}°C</b></div><div class="compare-stat"><span>👥 ${text("crowd")}</span><span class="crowd-pill ${c.crowd}">${crowdLabel(c.crowd)}</span></div></div></article>`;
         }).join("");
       }
       function setView(mode) {
@@ -1538,6 +1547,7 @@
             locateBtn.textContent = text("loc");
             rankPlaces();
             drawMarkers();
+            renderComparison();
           },
           () => {
             locateBtn.textContent = text("denied");
