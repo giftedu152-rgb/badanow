@@ -1501,29 +1501,27 @@
         return Math.min(100, Math.round(traits.walk * .62 + Math.min(stores, 5) * 5 + Math.min(parking, 4) * 2 + crowd * .45));
       }
       function activityReason(beachId) {
-        const c = beachConditions[beachId];
-        const rentals = P.filter((p) => p.beach === beachId && p.cat === "rental").length;
         const copy = {
           ko: {
-            swim: `🌊 파고 ${c.wave}m · 🌡️ 수온 ${c.water}°C · 👥 ${crowdLabel(c.crowd)}`,
-            fishing: `🎣 낚시 접근성 · 🅿️ 주차 편의`,
-            beginner: `🌊 파고 ${c.wave}m · 💨 풍속 ${c.wind}m/s · 🏄 대여점 ${rentals}곳`,
-            advanced: `🌊 파고 ${c.wave}m · 💨 풍속 ${c.wind}m/s · 파도 조건 반영`,
-            walk: `🚶 보행로·수변 경관 · 🏪 편의시설 · 👥 ${crowdLabel(c.crowd)}`,
+            swim: "파도가 비교적 잔잔하고 수온이 적당해 물놀이에 알맞습니다.",
+            fishing: "낚시 접근성이 좋고 주차 이용이 편리합니다.",
+            beginner: "파도와 바람이 초보자에게 적당하고 대여 시설 이용이 편리합니다.",
+            advanced: "더 높은 파도와 바람 조건이 숙련자에게 유리합니다.",
+            walk: "수변 산책로와 편의시설 이용이 편리합니다.",
           },
           en: {
-            swim: `🌊 ${c.wave}m wave · 🌡️ ${c.water}°C water · 👥 ${crowdLabel(c.crowd)}`,
-            fishing: `🎣 fishing access · 🅿️ parking`,
-            beginner: `🌊 ${c.wave}m wave · 💨 ${c.wind}m/s wind · 🏄 ${rentals} rental spots`,
-            advanced: `🌊 ${c.wave}m wave · 💨 ${c.wind}m/s wind · wave conditions`,
-            walk: `🚶 promenade & views · 🏪 amenities · 👥 ${crowdLabel(c.crowd)}`,
+            swim: "Gentler waves and a comfortable water temperature suit swimming.",
+            fishing: "Fishing access is good and parking is convenient.",
+            beginner: "The waves and wind are suitable for beginners, with convenient rentals.",
+            advanced: "Stronger waves and wind are more favorable for experienced surfers.",
+            walk: "The waterfront promenade and nearby amenities are convenient.",
           },
           zh: {
-            swim: `🌊 浪高 ${c.wave}m · 🌡️ 水温 ${c.water}°C · 👥 ${crowdLabel(c.crowd)}`,
-            fishing: `🎣 钓鱼可达性 · 🅿️ 停车便利`,
-            beginner: `🌊 浪高 ${c.wave}m · 💨 风速 ${c.wind}m/s · 🏄 ${rentals}处租赁点`,
-            advanced: `🌊 浪高 ${c.wave}m · 💨 风速 ${c.wind}m/s · 综合浪况`,
-            walk: `🚶 步道与景观 · 🏪 便利设施 · 👥 ${crowdLabel(c.crowd)}`,
+            swim: "海浪较平稳，水温适宜游泳。",
+            fishing: "钓鱼可达性好，停车也很方便。",
+            beginner: "海浪和风力适合初学者，租赁设施也很方便。",
+            advanced: "更高的浪和风力条件更适合熟练冲浪者。",
+            walk: "滨水步道和周边便利设施使用方便。",
           },
         };
         return copy[lang][activity === "surfing" ? surfLevel : activity];
